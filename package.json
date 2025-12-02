@@ -38,6 +38,7 @@
   "build": {
     "appId": "com.ctep.tabletop-framework",
     "productName": "CTEP Tabletop Framework",
+    "icon": "icon.png",
     "directories": {
       "output": "dist"
     },
