@@ -1,0 +1,31 @@
+{
+  "version": "1.0.0",
+  "scenarios": [
+    {
+      "id": "ransomware-healthcare-001",
+      "filename": "ransomware-healthcare.ctep.json",
+      "title": "Ransomware Attack: Regional Healthcare Provider",
+      "category": "ransomware",
+      "difficulty": "intermediate",
+      "duration": 120,
+      "description": "A regional healthcare organization discovers ransomware spreading across their network, encrypting patient records, disrupting clinical systems, and threatening patient care.",
+      "tags": ["ransomware", "healthcare", "HIPAA", "incident-response", "data-breach", "crisis-communication"],
+      "moduleCount": 5,
+      "injectCount": 15,
+      "questionCount": 15
+    },
+    {
+      "id": "bec-ceo-fraud-001",
+      "filename": "bec-ceo-fraud.ctep.json",
+      "title": "Business Email Compromise: CEO Fraud",
+      "category": "phishing",
+      "difficulty": "beginner",
+      "duration": 90,
+      "description": "A finance department employee receives a convincing email appearing to be from the CEO, requesting an urgent wire transfer to a new vendor.",
+      "tags": ["BEC", "CEO-fraud", "social-engineering", "wire-fraud", "phishing", "financial"],
+      "moduleCount": 4,
+      "injectCount": 9,
+      "questionCount": 12
+    }
+  ]
+}

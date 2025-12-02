@@ -1,0 +1,72 @@
+{
+  "name": "ctep-tabletop-framework",
+  "version": "1.0.0",
+  "description": "Cybersecurity Tabletop Exercise Platform for security defenders",
+  "main": "./out/main/index.js",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "package": "electron-builder",
+    "package:win": "electron-builder --win",
+    "package:mac": "electron-builder --mac",
+    "package:linux": "electron-builder --linux",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint ."
+  },
+  "keywords": ["ctep", "tabletop", "exercise", "cybersecurity", "cisa", "incident-response"],
+  "author": "Keith (AlchemicalChef)",
+  "license": "MIT",
+  "dependencies": {
+    "@vitejs/plugin-react": "^5.1.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "uuid": "^13.0.0",
+    "zustand": "^5.0.9"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.3",
+    "@types/uuid": "^10.0.0",
+    "electron": "^39.2.4",
+    "electron-builder": "^26.0.12",
+    "electron-vite": "^4.0.1",
+    "typescript": "^5.9.3",
+    "vite": "^7.2.6"
+  },
+  "build": {
+    "appId": "com.ctep.tabletop-framework",
+    "productName": "CTEP Tabletop Framework",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "out/**/*",
+      "resources/**/*"
+    ],
+    "win": {
+      "target": ["nsis", "portable"]
+    },
+    "mac": {
+      "target": ["dmg", "zip"]
+    },
+    "linux": {
+      "target": ["AppImage", "deb"]
+    },
+    "fileAssociations": [
+      {
+        "ext": "ctep.json",
+        "name": "CTEP Scenario",
+        "description": "CTEP Scenario File",
+        "role": "Editor"
+      },
+      {
+        "ext": "ctep-exercise.json",
+        "name": "CTEP Exercise",
+        "description": "CTEP Exercise File",
+        "role": "Editor"
+      }
+    ]
+  }
+}

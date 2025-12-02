@@ -1,0 +1,362 @@
+import type { LibraryEntry } from '../library'
+
+export const cisaOssScenario: LibraryEntry = {
+  id: 'cisa-oss-ctep-001',
+  title: 'CISA CTEP: Open Source Software Vulnerability',
+  category: 'supply_chain',
+  difficulty: 'advanced',
+  duration: 180,
+  description: 'Based on the official CISA Cybersecurity Tabletop Exercise Package (CTEP). This scenario explores a critical vulnerability discovered in a widely-used open source software component. Organizations must coordinate with the open source community, manage patch deployment, and respond when the vulnerability is exploited before patches are available.',
+  tags: ['open-source', 'vulnerability', 'SBOM', 'CISA', 'CTEP', 'supply-chain', 'patch-management', 'critical-infrastructure', 'software-supply-chain'],
+  moduleCount: 2,
+  injectCount: 9,
+  questionCount: 13,
+  scenario: {
+    id: 'cisa-oss-ctep-001',
+    title: 'CISA CTEP: Open Source Software Vulnerability',
+    description: 'Based on the official CISA Cybersecurity Tabletop Exercise Package (CTEP). This scenario explores a critical vulnerability in open source software used in your technology stack.',
+    version: '1.0.0',
+    author: 'Keith',
+    createdAt: '2024-04-01T00:00:00Z',
+    updatedAt: '2024-04-01T00:00:00Z',
+    threatCategory: 'supply_chain',
+    difficulty: 'advanced',
+    estimatedDuration: 180,
+    targetAudience: ['IT Security', 'Software Development', 'Executive Leadership', 'Legal/Compliance', 'Operations', 'Vendor Management'],
+    objectives: [
+      'Examine processes for identifying and tracking open source software in your environment',
+      'Practice responding to critical vulnerabilities in software dependencies',
+      'Understand the challenges of coordinating with open source communities during incidents',
+      'Identify gaps in software bill of materials (SBOM) and vulnerability management processes'
+    ],
+    facilitatorGuide: {
+      id: 'fg-cisa-oss-ctep-001',
+      createdAt: '2024-04-01T00:00:00Z',
+      updatedAt: '2024-04-01T00:00:00Z',
+      title: 'Facilitator Guide - CISA CTEP Open Source',
+      type: 'facilitator_guide',
+      format: 'markdown',
+      content: 'This exercise is based on CISA CTEP materials. Module 1 covers the vulnerability discovery and initial response. Module 2 covers the escalation when the vulnerability is actively exploited and patches are delayed. Emphasize the complexity of modern software supply chains and the dependence on open source components.'
+    },
+    additionalMaterials: [],
+    settings: {
+      allowParticipantSkip: false,
+      requireAllResponses: true,
+      showInjectTimestamps: true,
+      enableAnonymousResponses: false
+    },
+    modules: [
+      {
+        id: 'cisa-oss-mod-1',
+        createdAt: '2024-04-01T00:00:00Z',
+        updatedAt: '2024-04-01T00:00:00Z',
+        title: 'Module 1: Vulnerability Discovery',
+        description: 'A critical vulnerability is discovered in open source software used in your organization\'s technology stack.',
+        phase: 'detection',
+        order: 1,
+        suggestedDuration: 90,
+        facilitatorNotes: 'This module explores vulnerability awareness and initial response. Many organizations don\'t know what open source components they use.',
+        injects: [
+          {
+            id: 'cisa-oss-inj-1-1',
+            createdAt: '2024-04-01T00:00:00Z',
+            updatedAt: '2024-04-01T00:00:00Z',
+            order: 1,
+            title: 'Day 1: Critical Infrastructure Entity Reports Intrusion',
+            content: 'A critical infrastructure entity in your sector reports a significant intrusion to the sector ISAC. Initial investigation suggests the attack vector may be a previously unknown vulnerability in a widely-used open source software component.\n\nThe affected organization uses this software in their operational technology environment. They are still investigating the full scope.\n\nYour organization uses multiple open source components, but you\'re not certain if this specific component is in your environment.',
+            type: 'information',
+            severity: 'high',
+            triggerTime: 0,
+            source: 'Sector ISAC',
+            facilitatorNotes: 'This inject highlights the challenge of knowing your software inventory. Ask about SBOM capabilities.',
+            expectedActions: ['Inventory check for affected software', 'Monitor ISAC for updates', 'Alert development and operations teams'],
+            attachments: [],
+            relatedQuestionIds: ['cisa-oss-q-1-1']
+          },
+          {
+            id: 'cisa-oss-inj-1-2',
+            createdAt: '2024-04-01T00:00:00Z',
+            updatedAt: '2024-04-01T00:00:00Z',
+            order: 2,
+            title: 'Day 3: Vulnerability Identified',
+            content: 'Security researchers have identified the vulnerability. It is a critical remote code execution flaw in an open source library used for data parsing and serialization. The library is:\n\n- Included in thousands of applications and commercial products\n- Used by major cloud providers, enterprise software, and critical infrastructure\n- Often included as a transitive dependency (dependency of a dependency)\n- Present in your organization\'s primary business application\n\nCVSS Score: 10.0 (Critical)\nNo patch is currently available. The open source maintainers are working on a fix.\n\nYour development team confirms the vulnerable library is present in at least 12 internal applications.',
+            type: 'escalation',
+            severity: 'critical',
+            triggerTime: 15,
+            source: 'Security Research / Development Team',
+            facilitatorNotes: 'The vulnerability is now confirmed in your environment. Discuss mitigation options without a patch.',
+            attachments: [],
+            relatedQuestionIds: ['cisa-oss-q-1-2']
+          },
+          {
+            id: 'cisa-oss-inj-1-3',
+            createdAt: '2024-04-01T00:00:00Z',
+            updatedAt: '2024-04-01T00:00:00Z',
+            order: 3,
+            title: 'Day 7: CISA and FBI Joint Alert',
+            content: 'CISA and FBI issue a joint alert about the vulnerability. Key points:\n\n- Active exploitation observed in multiple sectors\n- Nation-state actors and ransomware groups are leveraging the vulnerability\n- Organizations should assume compromise if running vulnerable versions\n- Temporary mitigations include disabling certain features and network segmentation\n- Patch timeline remains unclear - maintainers are volunteer-based\n\nCISA establishes a coordinated vulnerability disclosure process and requests affected organizations share IOCs.',
+            type: 'information',
+            severity: 'critical',
+            triggerTime: 35,
+            source: 'CISA / FBI Joint Alert',
+            facilitatorNotes: 'Government involvement signals severity. Discuss coordination with federal partners.',
+            attachments: [],
+            relatedQuestionIds: ['cisa-oss-q-1-3', 'cisa-oss-q-1-5']
+          },
+          {
+            id: 'cisa-oss-inj-1-4',
+            createdAt: '2024-04-01T00:00:00Z',
+            updatedAt: '2024-04-01T00:00:00Z',
+            order: 4,
+            title: 'Day 10: Additional Critical Infrastructure Reports',
+            content: 'Multiple additional critical infrastructure entities report compromises related to the vulnerability:\n\n- A healthcare system reports patient data exposure\n- An energy utility reports attempted access to OT systems\n- A financial services firm reports data exfiltration\n\nThe sector ISAC is coordinating response across affected organizations. They request information about your organization\'s exposure and any indicators of compromise observed.\n\nMedia outlets are beginning to cover the story, referring to it as a "widespread cyber crisis."',
+            type: 'escalation',
+            severity: 'critical',
+            triggerTime: 55,
+            source: 'Sector ISAC / Media',
+            facilitatorNotes: 'The scope is expanding. Multiple sectors affected increases pressure and media attention.',
+            attachments: [],
+            relatedQuestionIds: ['cisa-oss-q-1-5']
+          },
+          {
+            id: 'cisa-oss-inj-1-5',
+            createdAt: '2024-04-01T00:00:00Z',
+            updatedAt: '2024-04-01T00:00:00Z',
+            order: 5,
+            title: 'Day 14: Vendor Notification',
+            content: 'Your primary enterprise software vendor notifies you that several of their products contain the vulnerable library. They are working on patches but cannot provide a timeline.\n\nAffected products in your environment include:\n- Your ERP system\n- Your email security gateway\n- Your backup and recovery solution\n- Your endpoint management platform\n\nThe vendor recommends implementing network-level mitigations while they develop patches.',
+            type: 'information',
+            severity: 'high',
+            triggerTime: 70,
+            source: 'Software Vendor',
+            facilitatorNotes: 'Commercial software dependencies on open source are now visible. Discuss vendor communication and pressure.',
+            attachments: [],
+            relatedQuestionIds: ['cisa-oss-q-1-4']
+          }
+        ],
+        discussionQuestions: [
+          {
+            id: 'cisa-oss-q-1-1',
+            createdAt: '2024-04-01T00:00:00Z',
+            updatedAt: '2024-04-01T00:00:00Z',
+            order: 1,
+            question: 'Does your organization maintain a Software Bill of Materials (SBOM) that tracks open source components in your applications and systems? How quickly could you identify affected systems?',
+            category: 'technical',
+            responseType: 'text',
+            guidanceNotes: 'SBOM capabilities are critical for vulnerability response. Many organizations lack this visibility.',
+            expectedThemes: ['SBOM maturity', 'Asset inventory', 'Dependency tracking', 'Response time']
+          },
+          {
+            id: 'cisa-oss-q-1-2',
+            createdAt: '2024-04-01T00:00:00Z',
+            updatedAt: '2024-04-01T00:00:00Z',
+            order: 2,
+            question: 'What temporary mitigations can you implement when a critical vulnerability has no patch available?',
+            category: 'technical',
+            responseType: 'text',
+            guidanceNotes: 'Discuss defense-in-depth measures: network segmentation, WAF rules, feature disabling, enhanced monitoring.',
+            expectedThemes: ['Network segmentation', 'WAF rules', 'Feature disabling', 'Enhanced monitoring']
+          },
+          {
+            id: 'cisa-oss-q-1-3',
+            createdAt: '2024-04-01T00:00:00Z',
+            updatedAt: '2024-04-01T00:00:00Z',
+            order: 3,
+            question: 'How would you coordinate with the open source community and contribute to the response effort?',
+            category: 'coordination',
+            responseType: 'text',
+            guidanceNotes: 'Open source response requires community coordination. Discuss contributing resources, testing, and communication.',
+            expectedThemes: ['Community engagement', 'Resource contribution', 'Testing support', 'Communication']
+          },
+          {
+            id: 'cisa-oss-q-1-4',
+            createdAt: '2024-04-01T00:00:00Z',
+            updatedAt: '2024-04-01T00:00:00Z',
+            order: 4,
+            question: 'What is your process for tracking vulnerabilities in commercial software that contains open source components?',
+            category: 'policy',
+            responseType: 'text',
+            guidanceNotes: 'Vendor management and software inventory intersect here. Discuss vendor communication requirements.',
+            expectedThemes: ['Vendor management', 'Software inventory', 'Vulnerability tracking', 'Communication requirements']
+          },
+          {
+            id: 'cisa-oss-q-1-5',
+            createdAt: '2024-04-01T00:00:00Z',
+            updatedAt: '2024-04-01T00:00:00Z',
+            order: 5,
+            question: 'How would you share threat intelligence with sector partners while protecting sensitive information about your environment?',
+            category: 'coordination',
+            responseType: 'text',
+            guidanceNotes: 'Information sharing requires balancing transparency with protection of sensitive details.',
+            expectedThemes: ['Information sharing', 'TLP protocols', 'ISAC engagement', 'Sensitive data protection']
+          }
+        ]
+      },
+      {
+        id: 'cisa-oss-mod-2',
+        createdAt: '2024-04-01T00:00:00Z',
+        updatedAt: '2024-04-01T00:00:00Z',
+        title: 'Module 2: Exploitation and Response',
+        description: 'The vulnerability is actively exploited against your organization while patches remain unavailable.',
+        phase: 'containment',
+        order: 2,
+        suggestedDuration: 90,
+        facilitatorNotes: 'This module covers active exploitation and response under challenging conditions. Patches are still not available, and attackers are actively targeting vulnerable systems.',
+        injects: [
+          {
+            id: 'cisa-oss-inj-2-1',
+            createdAt: '2024-04-01T00:00:00Z',
+            updatedAt: '2024-04-01T00:00:00Z',
+            order: 1,
+            title: 'Day 17: Patch Development Challenges',
+            content: 'The open source project maintainers provide an update:\n\n- The fix is more complex than initially expected\n- The vulnerability is deeply embedded in the library\'s core functionality\n- Initial patch attempts introduced breaking changes\n- Estimated time to stable patch: 2-4 more weeks\n- The volunteer maintainers are overwhelmed with requests\n\nSome organizations are attempting to develop their own temporary patches, but compatibility issues are arising.',
+            type: 'information',
+            severity: 'high',
+            triggerTime: 0,
+            source: 'Open Source Project',
+            facilitatorNotes: 'The reality of volunteer-maintained software becomes apparent. Discuss organizational expectations vs. reality.',
+            attachments: [],
+            relatedQuestionIds: ['cisa-oss-q-2-1', 'cisa-oss-q-2-2']
+          },
+          {
+            id: 'cisa-oss-inj-2-2',
+            createdAt: '2024-04-01T00:00:00Z',
+            updatedAt: '2024-04-01T00:00:00Z',
+            order: 2,
+            title: 'Day 21: Ransomware Activated',
+            content: 'Your security operations center detects ransomware activity on several servers. Investigation reveals:\n\n- Initial access was through the open source vulnerability\n- Attackers have been present for approximately 10 days\n- Ransomware has encrypted file servers containing business-critical data\n- Backup systems (which also contained the vulnerability) are affected\n- Ransom demand: $2.5 million in cryptocurrency\n\nThe attacker claims to have exfiltrated sensitive data and threatens to publish it.',
+            type: 'escalation',
+            severity: 'critical',
+            triggerTime: 20,
+            source: 'Security Operations Center',
+            facilitatorNotes: 'The vulnerability has been exploited despite mitigations. Now dealing with active ransomware.',
+            expectedActions: ['Activate incident response plan', 'Isolate affected systems', 'Assess backup availability', 'Engage legal and executive leadership'],
+            attachments: [],
+            relatedQuestionIds: ['cisa-oss-q-2-3']
+          },
+          {
+            id: 'cisa-oss-inj-2-3',
+            createdAt: '2024-04-01T00:00:00Z',
+            updatedAt: '2024-04-01T00:00:00Z',
+            order: 3,
+            title: 'Day 24: Media Inquiries',
+            content: 'Media outlets contact your communications department seeking comment on your organization being affected by the vulnerability exploitation. They cite:\n\n- Anonymous sources claiming your organization was breached\n- Social media posts from employees about system outages\n- The broader industry-wide vulnerability story\n\nThey are planning to run a story and want responses to specific questions about data exposure, customer impact, and ransom demands.',
+            type: 'communication',
+            severity: 'high',
+            triggerTime: 40,
+            source: 'Communications Department',
+            facilitatorNotes: 'Media involvement adds public pressure. Discuss crisis communications and message coordination.',
+            attachments: [],
+            relatedQuestionIds: ['cisa-oss-q-2-5']
+          },
+          {
+            id: 'cisa-oss-inj-2-4',
+            createdAt: '2024-04-01T00:00:00Z',
+            updatedAt: '2024-04-01T00:00:00Z',
+            order: 4,
+            title: 'Day 30: Package Repository Attacked',
+            content: 'The open source package repository that hosts the vulnerable library and its pending patch is under a distributed denial-of-service (DDoS) attack. The attack:\n\n- Prevents download of the newly released patch\n- Affects all organizations attempting to remediate\n- Is attributed to threat actors wanting to extend the exploitation window\n- May last for days according to repository operators\n\nAlternative distribution channels are being established, but verification of package integrity is challenging.',
+            type: 'escalation',
+            severity: 'high',
+            triggerTime: 60,
+            source: 'Open Source Community / Security News',
+            facilitatorNotes: 'Even when a patch is available, distribution can be disrupted. Discuss alternative channels and integrity verification.',
+            attachments: [],
+            relatedQuestionIds: ['cisa-oss-q-2-4']
+          }
+        ],
+        discussionQuestions: [
+          {
+            id: 'cisa-oss-q-2-1',
+            createdAt: '2024-04-01T00:00:00Z',
+            updatedAt: '2024-04-01T00:00:00Z',
+            order: 1,
+            question: 'With patches delayed, what additional mitigations could your organization implement to reduce risk?',
+            category: 'technical',
+            responseType: 'text',
+            guidanceNotes: 'Discuss advanced mitigations: taking systems offline, virtual patching, enhanced detection.',
+            expectedThemes: ['Advanced mitigations', 'System isolation', 'Virtual patching', 'Enhanced detection']
+          },
+          {
+            id: 'cisa-oss-q-2-2',
+            createdAt: '2024-04-01T00:00:00Z',
+            updatedAt: '2024-04-01T00:00:00Z',
+            order: 2,
+            question: 'The open source maintainers are overwhelmed volunteers. Should your organization offer resources to help? What form could that take?',
+            category: 'coordination',
+            responseType: 'text',
+            guidanceNotes: 'Organizations benefit from open source but rarely contribute. Discuss resource contribution models.',
+            expectedThemes: ['Resource contribution', 'Developer support', 'Financial contribution', 'Testing assistance']
+          },
+          {
+            id: 'cisa-oss-q-2-3',
+            createdAt: '2024-04-01T00:00:00Z',
+            updatedAt: '2024-04-01T00:00:00Z',
+            order: 3,
+            question: 'How would you manage business operations with critical systems offline while waiting for a patch?',
+            category: 'resource',
+            responseType: 'text',
+            guidanceNotes: 'Extended outages require business continuity planning and stakeholder management.',
+            expectedThemes: ['Business continuity', 'Manual processes', 'Stakeholder communication', 'Priority setting']
+          },
+          {
+            id: 'cisa-oss-q-2-4',
+            createdAt: '2024-04-01T00:00:00Z',
+            updatedAt: '2024-04-01T00:00:00Z',
+            order: 4,
+            question: 'When package repositories are attacked, how would you obtain and verify the integrity of patches?',
+            category: 'technical',
+            responseType: 'text',
+            guidanceNotes: 'Supply chain integrity is critical. Discuss signature verification, mirrors, and out-of-band distribution.',
+            expectedThemes: ['Package integrity', 'Signature verification', 'Alternative mirrors', 'Out-of-band distribution']
+          },
+          {
+            id: 'cisa-oss-q-2-5',
+            createdAt: '2024-04-01T00:00:00Z',
+            updatedAt: '2024-04-01T00:00:00Z',
+            order: 5,
+            question: 'How would you communicate with customers, partners, and regulators about your exposure to this widespread vulnerability?',
+            category: 'communication',
+            responseType: 'text',
+            guidanceNotes: 'Transparent communication builds trust. Discuss messaging strategy for various audiences.',
+            expectedThemes: ['Stakeholder communication', 'Transparency', 'Regulatory notification', 'Customer messaging']
+          },
+          {
+            id: 'cisa-oss-q-2-6',
+            createdAt: '2024-04-01T00:00:00Z',
+            updatedAt: '2024-04-01T00:00:00Z',
+            order: 6,
+            question: 'What changes would you make to your software development and procurement practices based on this experience?',
+            category: 'lessons_learned',
+            responseType: 'text',
+            guidanceNotes: 'Prevention requires changes to how software is developed, acquired, and maintained.',
+            expectedThemes: ['Secure development', 'Procurement requirements', 'SBOM requirements', 'Vendor assessments']
+          },
+          {
+            id: 'cisa-oss-q-2-7',
+            createdAt: '2024-04-01T00:00:00Z',
+            updatedAt: '2024-04-01T00:00:00Z',
+            order: 7,
+            question: 'How does your organization evaluate the risk of depending on volunteer-maintained open source projects for critical systems?',
+            category: 'policy',
+            responseType: 'text',
+            guidanceNotes: 'Open source sustainability is a growing concern. Discuss evaluation criteria and support models.',
+            expectedThemes: ['Open source risk assessment', 'Maintainer sustainability', 'Support options', 'Alternative evaluation']
+          },
+          {
+            id: 'cisa-oss-q-2-8',
+            createdAt: '2024-04-01T00:00:00Z',
+            updatedAt: '2024-04-01T00:00:00Z',
+            order: 8,
+            question: 'What role should government agencies like CISA play in coordinating response to widespread open source vulnerabilities?',
+            category: 'coordination',
+            responseType: 'text',
+            guidanceNotes: 'Government coordination can provide resources but also adds complexity. Discuss expectations and realities.',
+            expectedThemes: ['Government coordination', 'CISA role', 'Resource provision', 'Information sharing']
+          }
+        ]
+      }
+    ],
+    tags: ['open-source', 'vulnerability', 'SBOM', 'CISA', 'CTEP', 'supply-chain', 'patch-management', 'critical-infrastructure']
+  }
+}

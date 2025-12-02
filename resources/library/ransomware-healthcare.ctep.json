@@ -1,0 +1,571 @@
+{
+  "$schema": "https://ctep-framework.org/schema/v1/scenario.json",
+  "scenario": {
+    "id": "ransomware-healthcare-001",
+    "title": "Ransomware Attack: Regional Healthcare Provider",
+    "description": "A regional healthcare organization discovers ransomware spreading across their network, encrypting patient records, disrupting clinical systems, and threatening patient care. This exercise explores incident response, communication, and recovery decisions under pressure.",
+    "version": "1.0.0",
+    "author": "CTEP Framework",
+    "createdAt": "2024-01-15T00:00:00Z",
+    "updatedAt": "2024-01-15T00:00:00Z",
+    "threatCategory": "ransomware",
+    "difficulty": "intermediate",
+    "estimatedDuration": 120,
+    "targetAudience": ["IT Security", "Executive Leadership", "Legal/Compliance", "Communications", "Clinical Operations"],
+    "objectives": [
+      "Practice coordinated incident response across technical and business teams",
+      "Evaluate decision-making under time pressure with patient safety implications",
+      "Test communication protocols with stakeholders, regulators, and media",
+      "Identify gaps in ransomware response procedures and recovery capabilities"
+    ],
+    "facilitatorGuide": "This scenario is designed to escalate tension gradually. Start with Module 1 to establish context, then increase pressure through each subsequent module. Key decision points include: whether to pay ransom, when to notify regulators, and how to maintain patient care. Allow robust discussion at each decision point - there are no 'right' answers, only trade-offs to explore.",
+    "modules": [
+      {
+        "id": "mod-1-detection",
+        "title": "Initial Detection",
+        "description": "The IT security team receives alerts indicating potential ransomware activity on the network.",
+        "phase": "detection",
+        "order": 1,
+        "suggestedDuration": 20,
+        "facilitatorNotes": "Set the scene carefully. Participants should feel the initial confusion and urgency of a real incident. Don't reveal too much too quickly.",
+        "transitionGuidance": "Once the team has discussed initial response actions and established an incident command structure, transition to Module 2 to show the scope expanding.",
+        "injects": [
+          {
+            "id": "inj-1-1",
+            "title": "SIEM Alert - Unusual Encryption Activity",
+            "content": "Your Security Information and Event Management (SIEM) system has generated a HIGH priority alert:\n\nALERT ID: SEC-2024-0847\nSeverity: HIGH\nTimestamp: 07:42 AM\n\nMultiple Windows servers in the CLINICAL-EAST subnet are showing unusual file system activity. Large volumes of files are being accessed and modified rapidly. File extensions are being changed to '.locked' across multiple shares.\n\nAffected Systems (initial):\n- EHRSERVER-02 (Electronic Health Records)\n- FILESVR-CLINICAL-01\n- IMGARCHIVE-03 (Medical Imaging)\n\nPattern matches known ransomware behavior signatures.",
+            "type": "information",
+            "severity": "high",
+            "triggerTime": 0,
+            "source": "IT Security Operations Center",
+            "facilitatorNotes": "This is the opening inject. Give participants time to absorb the information and begin discussing. Key questions to prompt: Who needs to be notified? What immediate actions should be taken?",
+            "expectedActions": [
+              "Acknowledge the alert and begin investigation",
+              "Activate incident response procedures",
+              "Begin isolating affected systems",
+              "Notify incident response team lead"
+            ],
+            "attachments": []
+          },
+          {
+            "id": "inj-1-2",
+            "title": "Help Desk Calls Spike",
+            "content": "The IT Help Desk reports a sudden surge in calls from clinical staff:\n\n'We're getting flooded with calls from nurses and doctors on floors 3, 4, and 5 of the East building. They're reporting that they can't access patient files - getting errors about files being encrypted or corrupted. Some workstations are displaying a message about paying Bitcoin to recover files.'\n\nCall volume has increased 400% in the last 15 minutes.",
+            "type": "information",
+            "severity": "high",
+            "triggerTime": 5,
+            "source": "IT Help Desk Supervisor",
+            "facilitatorNotes": "This confirms the ransomware and shows it's affecting clinical operations. Watch for participants to start thinking about patient safety.",
+            "expectedActions": [
+              "Instruct help desk to log all reports with specific details",
+              "Consider broader communication to staff",
+              "Escalate to senior leadership"
+            ],
+            "attachments": []
+          },
+          {
+            "id": "inj-1-3",
+            "title": "Ransom Note Discovered",
+            "content": "A clinical workstation displays the following message:\n\n---\nATTENTION MERCY REGIONAL HEALTH SYSTEM\n\nAll your files have been encrypted with military-grade encryption. Your patient records, financial data, and operational systems are now locked.\n\nTo recover your data, you must pay 75 Bitcoin (approximately $3.2 million USD) to the following wallet address within 72 hours.\n\nWallet: bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh\n\nAfter payment, contact us at: darkrecovery@protonmail.com\n\nIf you do not pay within 72 hours:\n- The ransom doubles to 150 Bitcoin\n- After 7 days, all data will be permanently deleted\n- We will publish sensitive patient data on our leak site\n\nDo not contact law enforcement. Do not attempt to decrypt files yourself. We are watching.\n\n- DarkSide Collective\n---",
+            "type": "escalation",
+            "severity": "critical",
+            "triggerTime": 10,
+            "source": "Screenshot from affected workstation",
+            "facilitatorNotes": "This is a major escalation point. The threat to publish patient data adds HIPAA/regulatory concerns. Let participants discuss the ransom demand implications.",
+            "expectedActions": [
+              "Document the ransom note carefully",
+              "Do NOT interact with the threat actor yet",
+              "Brief executive leadership immediately",
+              "Contact legal counsel"
+            ],
+            "attachments": []
+          }
+        ],
+        "discussionQuestions": [
+          {
+            "id": "q-1-1",
+            "question": "What is your immediate priority: containing the spread or preserving evidence for investigation?",
+            "category": "decision",
+            "context": "These priorities can sometimes conflict. Rapid containment may destroy forensic evidence, while careful evidence preservation may allow further spread.",
+            "responseType": "text",
+            "guidanceNotes": "This is a classic incident response tension. There's no perfect answer - the goal is to explore how teams balance these competing needs. Most experts recommend prioritizing containment for active ransomware.",
+            "expectedThemes": ["Containment priority", "Balance needed", "Evidence preservation importance", "Business impact consideration"],
+            "followUpQuestions": [
+              "How would your answer change if this were a slower-moving threat?",
+              "Who has authority to make this call in your organization?"
+            ],
+            "suggestedDiscussionTime": 5
+          },
+          {
+            "id": "q-1-2",
+            "question": "At what point should you notify the CEO and Board of Directors?",
+            "category": "communication",
+            "responseType": "text",
+            "guidanceNotes": "Executive notification timing varies by organization. Too early and you lack information; too late and they feel blindsided. Most organizations have escalation thresholds defined in IR plans.",
+            "expectedThemes": ["Immediate notification", "Gather facts first", "Defined escalation criteria", "Communication chain"],
+            "followUpQuestions": [
+              "What information would executives need in the first briefing?",
+              "How do you balance speed of notification with accuracy of information?"
+            ],
+            "suggestedDiscussionTime": 5
+          }
+        ]
+      },
+      {
+        "id": "mod-2-containment",
+        "title": "Containment & Scope Assessment",
+        "description": "The incident response team works to contain the spread while assessing the full scope of the compromise.",
+        "phase": "containment",
+        "order": 2,
+        "suggestedDuration": 25,
+        "facilitatorNotes": "This module introduces the tension between IT response and clinical operations. Patient care concerns should start dominating the conversation.",
+        "transitionGuidance": "Move to Module 3 when participants have addressed immediate containment and are ready to deal with external stakeholders and regulatory requirements.",
+        "injects": [
+          {
+            "id": "inj-2-1",
+            "title": "Network Isolation Decision",
+            "content": "The IT Security team presents options for network containment:\n\nOption A: Full network isolation\n- Disconnect ALL network segments from each other and the internet\n- Will stop ransomware spread immediately\n- Will disable ALL clinical systems, including:\n  * Electronic Health Records\n  * Medication dispensing systems\n  * Lab result delivery\n  * Medical device connectivity\n  * Phone systems (VoIP)\n\nOption B: Targeted isolation\n- Isolate only confirmed-affected segments\n- Maintains some clinical system availability\n- Risk: ransomware may have spread to 'clean' segments\n\nOption C: Monitor and contain\n- Block known malicious IPs/domains at firewall\n- Deploy endpoint detection rules\n- Maintain operations while monitoring\n- Highest risk but least disruption\n\nThe CISO needs a decision in the next 10 minutes.",
+            "type": "decision_point",
+            "severity": "critical",
+            "triggerTime": 0,
+            "source": "Chief Information Security Officer",
+            "facilitatorNotes": "This is a critical decision point. Push participants to commit to an option and justify their choice. There's no perfect answer here.",
+            "expectedActions": [
+              "Evaluate patient safety implications of each option",
+              "Consider regulatory requirements",
+              "Make a timely decision",
+              "Document the decision rationale"
+            ],
+            "attachments": []
+          },
+          {
+            "id": "inj-2-2",
+            "title": "Clinical Impact Report",
+            "content": "The Chief Medical Officer provides a clinical impact assessment:\n\n'We currently have 247 inpatients across our facilities. Here's what we're facing:\n\n- ICU (32 patients): Life support systems are on isolated networks and functioning. However, we've lost remote monitoring capability and real-time lab results.\n\n- Emergency Department: Currently have 18 patients. We can't access medical histories or allergies electronically. We're going to paper but it's slowing everything down.\n\n- Surgery: We have 6 procedures scheduled for today. The surgical planning system is down. Surgeons are requesting postponement.\n\n- Pharmacy: Automated dispensing cabinets are offline. We're doing manual medication verification which is tripling the time for each dose.\n\n- Radiology: PACS system is encrypted. We cannot view any imaging studies taken in the last 3 years.\n\nI need to know: Should we divert incoming ambulances to other facilities? Should we cancel elective procedures? These decisions affect patient outcomes.'",
+            "type": "information",
+            "severity": "critical",
+            "triggerTime": 8,
+            "source": "Chief Medical Officer",
+            "facilitatorNotes": "This inject forces participants to confront the real-world patient safety implications. Healthcare participants often find this very impactful.",
+            "expectedActions": [
+              "Convene clinical leadership for patient safety decisions",
+              "Implement downtime procedures",
+              "Consider ambulance diversion",
+              "Document all clinical workarounds"
+            ],
+            "attachments": []
+          },
+          {
+            "id": "inj-2-3",
+            "title": "Forensic Discovery - Entry Point",
+            "content": "The incident response team has made an initial forensic discovery:\n\n'We've identified the likely initial access point. A phishing email was opened by a user in the billing department 6 days ago. The email contained a malicious attachment disguised as an invoice.\n\nThe attacker has been in our network for almost a week before triggering the ransomware. During this time, they likely:\n- Harvested credentials\n- Mapped our network\n- Identified critical systems\n- Potentially exfiltrated data\n\nWe've found evidence of large data transfers to an external IP address over the past 4 days. Approximately 400GB of data was transferred. We're still determining what data was taken, but the transfers originated from servers containing:\n- Patient demographic data\n- Medical records\n- Insurance information\n- Employee HR files'",
+            "type": "information",
+            "severity": "critical",
+            "triggerTime": 15,
+            "source": "Incident Response Team Lead",
+            "facilitatorNotes": "This changes the nature of the incident - it's now also a data breach. HIPAA notification requirements come into play. Watch for participants to recognize this shift.",
+            "expectedActions": [
+              "Recognize this as a reportable data breach",
+              "Begin identifying affected individuals",
+              "Engage legal counsel regarding notification requirements",
+              "Preserve evidence of exfiltration"
+            ],
+            "attachments": []
+          }
+        ],
+        "discussionQuestions": [
+          {
+            "id": "q-2-1",
+            "question": "The CMO is asking whether to divert ambulances and cancel surgeries. Who has the authority to make this decision, and what factors should drive it?",
+            "category": "decision",
+            "context": "This is a patient safety decision with legal, operational, and clinical implications.",
+            "responseType": "text",
+            "guidanceNotes": "This question explores the intersection of IT incident response and clinical operations. In most healthcare organizations, clinical leadership has final say on patient care decisions, but they need IT input on system availability.",
+            "expectedThemes": ["Clinical authority", "Patient safety first", "Risk assessment", "Regulatory considerations"],
+            "followUpQuestions": [
+              "How do you communicate this decision to staff and patients?",
+              "What criteria would you use to decide when to resume normal operations?"
+            ],
+            "suggestedDiscussionTime": 7
+          },
+          {
+            "id": "q-2-2",
+            "question": "You've confirmed data exfiltration. Under HIPAA, when does your notification clock start, and who must be notified?",
+            "category": "policy",
+            "responseType": "text",
+            "guidanceNotes": "HIPAA requires notification within 60 days of discovery for breaches affecting 500+ individuals. HHS, affected individuals, and media (for large breaches) must be notified. Many states have additional requirements.",
+            "expectedThemes": ["60-day notification rule", "HHS OCR notification", "State requirements", "Individual notification"],
+            "followUpQuestions": [
+              "How do you determine the scope of affected individuals?",
+              "What if you're not sure whether data was actually accessed?"
+            ],
+            "suggestedDiscussionTime": 5
+          },
+          {
+            "id": "q-2-3",
+            "question": "Should you engage a third-party incident response firm? What are the considerations?",
+            "category": "resource",
+            "responseType": "text",
+            "guidanceNotes": "Third-party IR firms provide expertise but add cost and coordination overhead. Consider: Do you have in-house expertise? Is this beyond your team's experience? Will your cyber insurance cover it?",
+            "expectedThemes": ["Expertise gap", "Cost considerations", "Insurance requirements", "Legal privilege"],
+            "followUpQuestions": [
+              "Should the IR firm be engaged through legal counsel for privilege?",
+              "How quickly can a third party mobilize?"
+            ],
+            "suggestedDiscussionTime": 5
+          }
+        ]
+      },
+      {
+        "id": "mod-3-external",
+        "title": "External Communications & Stakeholders",
+        "description": "Managing communications with regulators, law enforcement, media, and the public.",
+        "phase": "containment",
+        "order": 3,
+        "suggestedDuration": 25,
+        "facilitatorNotes": "This module tests communication and coordination skills. Multiple external parties will demand attention simultaneously.",
+        "transitionGuidance": "Progress to Module 4 when participants have addressed the major external stakeholder communications and are ready to discuss recovery options.",
+        "injects": [
+          {
+            "id": "inj-3-1",
+            "title": "FBI Cyber Division Contact",
+            "content": "You receive a call from the FBI Cyber Division field office:\n\n'This is Special Agent Morrison from the FBI Cyber Division. We've received information that your organization may be the victim of a ransomware attack by a group we're actively investigating. We'd like to offer our assistance and request your cooperation.\n\nWe can provide:\n- Threat intelligence on this specific actor\n- Potential decryption assistance if we have keys from previous investigations\n- Guidance on ransom negotiation (we don't recommend paying, but if you do, we can help ensure you're not violating OFAC sanctions)\n\nWe request:\n- Copies of the ransom notes and any communications\n- Network logs and forensic images\n- Agreement not to publicly attribute the attack until our investigation is complete\n\nTime is critical. Can we send agents to your location today?'",
+            "type": "communication",
+            "severity": "medium",
+            "triggerTime": 0,
+            "source": "FBI Cyber Division",
+            "facilitatorNotes": "Law enforcement engagement is voluntary but can be very helpful. Discuss the benefits and any concerns participants might have.",
+            "expectedActions": [
+              "Coordinate with legal counsel on FBI engagement",
+              "Consider FBI assistance carefully",
+              "Understand OFAC sanctions implications",
+              "Balance law enforcement needs with business recovery"
+            ],
+            "attachments": []
+          },
+          {
+            "id": "inj-3-2",
+            "title": "Media Inquiry",
+            "content": "Your Communications Director rushes in:\n\n'We have a problem. A reporter from the local TV station just called asking for comment on the 'major cyberattack' at our hospital. They say they have sources inside the hospital confirming that patient care is being affected.\n\nThey're planning to run a story on the 6 PM news tonight - that's in 4 hours. They're asking:\n1. Can we confirm a cyberattack occurred?\n2. Is patient data at risk?\n3. Are patients safe?\n4. Are we paying a ransom?\n\nI need guidance on how to respond. If we say 'no comment,' they'll run the story anyway and it'll look like we're hiding something. But if we confirm too much, we might complicate our legal position or negotiation with the attackers.'",
+            "type": "communication",
+            "severity": "high",
+            "triggerTime": 8,
+            "source": "Communications Director",
+            "facilitatorNotes": "Media management during incidents is challenging. Push participants to draft actual talking points.",
+            "expectedActions": [
+              "Prepare holding statement",
+              "Coordinate messaging with legal",
+              "Focus on patient safety message",
+              "Avoid speculation about ransom or data"
+            ],
+            "attachments": []
+          },
+          {
+            "id": "inj-3-3",
+            "title": "HHS OCR Notification Decision",
+            "content": "Your Privacy Officer and Legal Counsel present a decision point:\n\n'We've confirmed that at least 15,000 patient records were likely accessed and potentially exfiltrated. Under HIPAA, we need to report this to HHS OCR within 60 days.\n\nHowever, there's a question of timing:\n\nOption A: Report immediately\n- Demonstrates good faith and transparency\n- May be premature if scope changes\n- Could trigger media attention\n\nOption B: Wait until investigation complete\n- More accurate reporting\n- Risk of appearing to delay\n- Still within regulatory timeframe\n\nOption C: Report now with preliminary numbers, update later\n- Balance of transparency and accuracy\n- Creates administrative overhead\n\nWe also need to decide about state notification requirements. Three states where our patients reside have breach notification laws with shorter timeframes than HIPAA. Massachusetts requires notification within 'reasonable' time, New York requires 'expedient' notification, and California requires notification 'in the most expedient time possible.'\n\nHow do you want to proceed?'",
+            "type": "decision_point",
+            "severity": "high",
+            "triggerTime": 15,
+            "source": "Privacy Officer / Legal Counsel",
+            "facilitatorNotes": "Regulatory notification timing is often debated. There's no perfect answer - discuss the trade-offs of each approach.",
+            "expectedActions": [
+              "Make a defensible notification timing decision",
+              "Consider state-specific requirements",
+              "Document decision rationale",
+              "Prepare notification content"
+            ],
+            "attachments": []
+          },
+          {
+            "id": "inj-3-4",
+            "title": "Cyber Insurance Claim",
+            "content": "Your CFO has been on the phone with your cyber insurance carrier:\n\n'I've got good news and complicated news. Our cyber insurance policy has a $5 million limit with a $100,000 deductible. The carrier is assigning a breach coach and will cover:\n- Incident response firm costs\n- Legal fees\n- Notification costs\n- Credit monitoring for affected individuals\n- Potentially ransom payment (with conditions)\n\nHowever, they have requirements:\n1. We must use their approved IR firm and legal counsel\n2. All communications about ransom must go through them\n3. We cannot publicly disclose insurance coverage\n4. They want daily written status updates\n5. They're sending their own forensic team to validate our team's findings\n\nThe complicated part: The policy has an exclusion for 'failure to maintain reasonable security.' Their team will be looking at whether our security was adequate. If they find significant gaps, they might deny coverage.\n\nAlso, the policy excludes coverage if we're found to have had prior knowledge of vulnerabilities that led to the breach. That phishing email came through despite our email security gateway - is that a 'known vulnerability'?\n\nI need to understand how to work with them while protecting our interests.'",
+            "type": "information",
+            "severity": "medium",
+            "triggerTime": 20,
+            "source": "Chief Financial Officer",
+            "facilitatorNotes": "Cyber insurance adds complexity to incident response. Discuss how insurance requirements might conflict with other priorities.",
+            "expectedActions": [
+              "Review policy carefully with legal",
+              "Coordinate with insurance requirements",
+              "Maintain documentation for coverage",
+              "Balance insurance needs with operational needs"
+            ],
+            "attachments": []
+          }
+        ],
+        "discussionQuestions": [
+          {
+            "id": "q-3-1",
+            "question": "Should you engage with the FBI? What are the benefits and risks?",
+            "category": "coordination",
+            "responseType": "text",
+            "guidanceNotes": "FBI can provide valuable threat intelligence and potential decryption help. Concerns include investigation timeline conflicts, public disclosure, and resource demands. In general, law enforcement engagement is recommended.",
+            "expectedThemes": ["Intelligence value", "Decryption possibility", "Investigation timeline", "Voluntary nature"],
+            "followUpQuestions": [
+              "Would your answer change if the attackers specifically warned against law enforcement contact?",
+              "How do you coordinate FBI involvement with your insurance carrier?"
+            ],
+            "suggestedDiscussionTime": 5
+          },
+          {
+            "id": "q-3-2",
+            "question": "Draft your key messages for the media inquiry. What will you say and not say?",
+            "category": "communication",
+            "responseType": "text",
+            "guidanceNotes": "Effective crisis communication focuses on: what you know, what you're doing, patient safety. Avoid: speculation, blame, detailed technical information, ransom discussion.",
+            "expectedThemes": ["Patient safety focus", "Action-oriented messaging", "Avoid speculation", "Coordinated response"],
+            "followUpQuestions": [
+              "How do you handle employee social media during the incident?",
+              "What if an employee has already posted details online?"
+            ],
+            "suggestedDiscussionTime": 7
+          },
+          {
+            "id": "q-3-3",
+            "question": "How do you balance your insurance carrier's requirements with your operational and legal needs?",
+            "category": "coordination",
+            "responseType": "text",
+            "guidanceNotes": "Insurance carriers have legitimate interests but their priorities may not align perfectly with yours. Legal counsel should review all insurance interactions.",
+            "expectedThemes": ["Legal review", "Documentation", "Coordination requirements", "Coverage preservation"],
+            "followUpQuestions": [
+              "What if the insurance company's approved IR firm conflicts with one you've already engaged?",
+              "How do you handle the 'reasonable security' exclusion concern?"
+            ],
+            "suggestedDiscussionTime": 5
+          }
+        ]
+      },
+      {
+        "id": "mod-4-ransom",
+        "title": "The Ransom Decision",
+        "description": "Leadership must decide whether to pay the ransom demand.",
+        "phase": "eradication",
+        "order": 4,
+        "suggestedDuration": 25,
+        "facilitatorNotes": "This is often the most contentious module. Allow robust debate. There's no 'right' answer - the goal is to explore the decision framework.",
+        "transitionGuidance": "After the ransom decision discussion, move to Module 5 to focus on recovery regardless of what decision was made.",
+        "injects": [
+          {
+            "id": "inj-4-1",
+            "title": "Ransom Negotiation Contact",
+            "content": "Through a third-party negotiation firm (recommended by your insurance carrier), initial contact has been made with the attackers. Here's the update:\n\n'We've established communication with the threat actor. They've provided proof of life - they decrypted 3 sample files we submitted, confirming they have working keys.\n\nNegotiation status:\n- Original demand: 75 Bitcoin ($3.2M)\n- Current negotiated amount: 45 Bitcoin ($1.9M)\n- They claim they will provide decryption keys for all systems\n- They claim they will delete exfiltrated data and not publish it\n- They have a 'customer service' reputation - in past incidents, they've generally honored agreements\n\nCaveats:\n- There's no guarantee decryption will work on all files\n- We have no way to verify they'll actually delete our data\n- Payment does not eliminate our regulatory obligations\n- Average decryption success rate for this group is ~85%\n\nThe attackers have extended our deadline by 24 hours as a 'good faith' gesture during negotiations. Decision needed within 12 hours.'",
+            "type": "decision_point",
+            "severity": "critical",
+            "triggerTime": 0,
+            "source": "Ransomware Negotiation Firm",
+            "facilitatorNotes": "Present this neutrally. The goal is discussion, not advocating for a particular decision. Both paying and not paying have legitimate arguments.",
+            "expectedActions": [
+              "Evaluate all factors in decision",
+              "Consider alternatives to payment",
+              "Assess legal and regulatory implications",
+              "Make a defensible decision"
+            ],
+            "attachments": []
+          },
+          {
+            "id": "inj-4-2",
+            "title": "Recovery Assessment Without Payment",
+            "content": "Your IT team has completed a recovery assessment assuming NO ransom payment:\n\n'Without the decryption keys, here's our realistic recovery timeline:\n\nBackup Status:\n- Last full backup: 8 days ago (weekend before attack)\n- Incremental backups: Encrypted by ransomware\n- Offsite backup: 30 days old (monthly rotation)\n- Some backups may be compromised - testing required\n\nRecovery Timeline (estimates):\n- Critical systems (EHR, core infrastructure): 2-3 weeks\n- Full clinical operations: 4-6 weeks\n- Complete restoration: 8-12 weeks\n\nData Loss:\n- 8 days of patient records\n- Approximately 3,200 patient visits not recoverable\n- Unknown amount of operational data\n\nCosts (estimated):\n- Emergency IT resources: $500K-800K\n- Lost revenue during downtime: $2-4M\n- Regulatory fines (potential): $1-5M\n- Reputational damage: Unquantifiable\n\nNote: These timelines assume no complications. Previous healthcare ransomware recoveries have often taken longer than initial estimates.'",
+            "type": "information",
+            "severity": "high",
+            "triggerTime": 5,
+            "source": "IT Director",
+            "facilitatorNotes": "This provides the 'don't pay' scenario. The numbers should feel uncomfortable but not impossible.",
+            "expectedActions": [
+              "Evaluate recovery costs vs ransom",
+              "Consider patient care implications",
+              "Assess data loss impact",
+              "Factor in timeline for clinical operations"
+            ],
+            "attachments": []
+          },
+          {
+            "id": "inj-4-3",
+            "title": "OFAC Sanctions Check",
+            "content": "Your legal team has completed an OFAC (Office of Foreign Assets Control) sanctions review:\n\n'We've worked with a sanctions compliance firm to assess whether payment would violate US sanctions.\n\nFindings:\n- The threat actor group 'DarkSide Collective' is NOT currently on the OFAC SDN (Specially Designated Nationals) list\n- However, they are believed to operate from Russia\n- OFAC has issued advisories warning that ransomware payments may violate sanctions even if the specific group isn't listed\n- OFAC considers the 'totality of circumstances' and 'sanctions compliance program' when assessing penalties\n\nRisk Assessment:\n- Direct sanctions violation: LOW probability\n- OFAC inquiry/investigation: MEDIUM probability\n- Reputational risk if payment becomes public: HIGH\n\nRecommendation: If we decide to pay, we should:\n1. Document our decision-making process thoroughly\n2. File a voluntary self-disclosure with OFAC\n3. Implement enhanced sanctions screening going forward\n4. Ensure payment goes through a compliant financial channel\n\nPayment does not guarantee immunity from OFAC scrutiny, but good-faith compliance efforts are considered mitigating factors.'",
+            "type": "information",
+            "severity": "medium",
+            "triggerTime": 10,
+            "source": "General Counsel",
+            "facilitatorNotes": "OFAC considerations add legal complexity to the payment decision. This is an evolving regulatory area.",
+            "expectedActions": [
+              "Document compliance considerations",
+              "Consider voluntary disclosure",
+              "Ensure proper payment channels",
+              "Accept residual legal risk"
+            ],
+            "attachments": []
+          },
+          {
+            "id": "inj-4-4",
+            "title": "Board of Directors Position",
+            "content": "The Board Chair has convened an emergency session and relays their position:\n\n'The Board has discussed the situation at length. We're not going to mandate a specific decision - that's management's call. But we want you to know our perspective:\n\n1. Patient Safety First: Whatever decision you make, patient safety must be the primary consideration. If paying the ransom gets patients back to safe care faster, that carries significant weight.\n\n2. Fiduciary Responsibility: We have an obligation to stakeholders to minimize financial damage. However, we recognize this is not purely a financial decision.\n\n3. Precedent Concerns: Some board members are concerned that paying encourages future attacks. Others argue that each situation is unique.\n\n4. Documentation: Whatever you decide, document EVERYTHING. We may need to defend this decision to regulators, shareholders, and the public.\n\n5. Support: The Board will support management's decision as long as it's made thoughtfully and with appropriate input.\n\nWe've authorized expenditure of up to $5M for incident response and recovery, whether that includes ransom payment or not. Make the decision you believe is right for our patients, staff, and organization.'",
+            "type": "information",
+            "severity": "medium",
+            "triggerTime": 15,
+            "source": "Board Chair",
+            "facilitatorNotes": "The Board's position is deliberately neutral, pushing the decision back to the exercise participants.",
+            "expectedActions": [
+              "Acknowledge Board guidance",
+              "Document decision rationale thoroughly",
+              "Balance all stakeholder interests",
+              "Make a defensible decision"
+            ],
+            "attachments": []
+          }
+        ],
+        "discussionQuestions": [
+          {
+            "id": "q-4-1",
+            "question": "Should you pay the ransom? What factors are most important in your decision?",
+            "category": "decision",
+            "context": "Consider: patient safety, financial impact, legal implications, ethical considerations, precedent, and likelihood of successful recovery.",
+            "responseType": "text",
+            "guidanceNotes": "This is THE central question of the module. Allow extensive discussion. Both positions have merit. Focus on the decision FRAMEWORK rather than just the decision itself.",
+            "expectedThemes": ["Patient safety priority", "Financial analysis", "Ethical considerations", "No guarantee of recovery", "Funding criminal enterprise"],
+            "followUpQuestions": [
+              "Would your decision change if the ransom were $500K instead of $1.9M?",
+              "Would your decision change if no patient data had been exfiltrated?",
+              "If you pay and they don't honor the agreement, what's your recourse?"
+            ],
+            "suggestedDiscussionTime": 15
+          },
+          {
+            "id": "q-4-2",
+            "question": "If you decide to pay, how do you communicate this decision to staff, patients, and the public?",
+            "category": "communication",
+            "responseType": "text",
+            "guidanceNotes": "Many organizations choose not to disclose ransom payments. However, in healthcare, transparency may be important for maintaining trust. Consider the risks of disclosure vs. non-disclosure.",
+            "expectedThemes": ["Transparency considerations", "Legal advice", "Public trust", "Future attack prevention"],
+            "followUpQuestions": [
+              "What if a journalist asks directly whether you paid?",
+              "How do you explain to staff who were told 'we don't negotiate with criminals'?"
+            ],
+            "suggestedDiscussionTime": 5
+          },
+          {
+            "id": "q-4-3",
+            "question": "If you decide NOT to pay, how do you maintain staff morale and patient confidence during a potentially months-long recovery?",
+            "category": "coordination",
+            "responseType": "text",
+            "guidanceNotes": "Long recoveries strain organizations. Consider how to sustain the team, communicate progress, and maintain care quality during extended downtime procedures.",
+            "expectedThemes": ["Staff communication", "Regular updates", "Celebrating milestones", "External support"],
+            "followUpQuestions": [
+              "How do you prevent burnout among IT and clinical staff?",
+              "What if key staff members resign during the recovery?"
+            ],
+            "suggestedDiscussionTime": 5
+          }
+        ]
+      },
+      {
+        "id": "mod-5-recovery",
+        "title": "Recovery & Lessons Learned",
+        "description": "Rebuilding systems and operations, and capturing lessons learned for future resilience.",
+        "phase": "recovery",
+        "order": 5,
+        "suggestedDuration": 20,
+        "facilitatorNotes": "This final module shifts focus to recovery and improvement. It's more forward-looking and should end on a constructive note.",
+        "transitionGuidance": "Conclude the exercise with the hotwash discussion questions, then transition to the formal AAR.",
+        "injects": [
+          {
+            "id": "inj-5-1",
+            "title": "Recovery Progress Update",
+            "content": "It's been 72 hours since the incident began. Here's the current status:\n\n[Assuming partial recovery achieved]\n\nSystems Status:\n- Core network infrastructure: RESTORED\n- Email and communication: RESTORED\n- Electronic Health Records: PARTIAL (read-only access to historical data)\n- New patient documentation: Using temporary system\n- Medical devices: 80% reconnected\n- Full EHR write capability: Expected in 48-72 hours\n\nClinical Operations:\n- Emergency Department: OPEN, normal operations\n- Inpatient care: OPERATIONAL with workarounds\n- Surgeries: RESUMING (non-emergent still postponed)\n- Ambulance diversion: ENDED\n\nOutstanding Issues:\n- 15% of patient records still being verified\n- Some medical images from last 2 years still inaccessible\n- Patient portal remains offline\n- Staff working significant overtime\n\nThe immediate crisis is stabilizing, but full recovery is still weeks away.",
+            "type": "information",
+            "severity": "medium",
+            "triggerTime": 0,
+            "source": "Incident Commander",
+            "facilitatorNotes": "This inject shows light at the end of the tunnel while acknowledging ongoing challenges.",
+            "expectedActions": [
+              "Plan for sustained recovery operations",
+              "Begin transitioning from crisis to normal operations",
+              "Identify ongoing resource needs",
+              "Start planning lessons learned process"
+            ],
+            "attachments": []
+          },
+          {
+            "id": "inj-5-2",
+            "title": "Patient Notification Planning",
+            "content": "Your Privacy Officer needs decisions on patient breach notification:\n\n'We've completed our preliminary assessment of affected individuals:\n\n- Total patients potentially affected: 127,000\n- Confirmed data accessed: 47,000 records\n- Data types exposed: Names, DOB, SSN, medical record numbers, diagnosis codes, insurance information\n\nNotification options:\n1. Notify all 127,000 (conservative approach)\n2. Notify only confirmed 47,000 (defensible but narrower)\n3. Phased notification starting with highest risk\n\nNotification content:\n- We need to explain what happened\n- What data was involved\n- What we're doing about it\n- What patients should do (credit monitoring, etc.)\n\nWe're offering 2 years of credit monitoring and identity protection services. Estimated cost: $25 per person = $1.1M to $3.1M depending on population.\n\nPress release and patient letter drafts are ready for your review.\n\nWe also need to notify HHS within the next week to meet our self-imposed timeline for 'expedient' notification.'",
+            "type": "decision_point",
+            "severity": "medium",
+            "triggerTime": 8,
+            "source": "Privacy Officer",
+            "facilitatorNotes": "Notification decisions involve balancing over-notification costs against under-notification risks. Discuss the trade-offs.",
+            "expectedActions": [
+              "Decide on notification scope",
+              "Review notification content",
+              "Approve credit monitoring offering",
+              "Finalize regulatory notifications"
+            ],
+            "attachments": []
+          },
+          {
+            "id": "inj-5-3",
+            "title": "Improvement Recommendations",
+            "content": "Your CISO presents preliminary improvement recommendations:\n\n'Based on what we've learned, here are priority improvements we need to make:\n\nImmediate (0-30 days):\n1. Deploy EDR to all endpoints (we had gaps)\n2. Implement network segmentation for clinical systems\n3. Enhance email filtering and phishing protection\n4. Mandatory security awareness training refresh\n\nShort-term (30-90 days):\n5. Implement offline/immutable backup solution\n6. Deploy multi-factor authentication everywhere\n7. Create dedicated incident response retainer\n8. Conduct tabletop exercises quarterly\n\nMedium-term (90-180 days):\n9. Zero-trust network architecture assessment\n10. Third-party security assessment\n11. Cyber insurance policy review and enhancement\n12. Business continuity plan update\n\nEstimated investment needed: $2-3M over 18 months.\n\nWe can provide detailed project plans and ROI analysis for each recommendation.'",
+            "type": "information",
+            "severity": "low",
+            "triggerTime": 15,
+            "source": "Chief Information Security Officer",
+            "facilitatorNotes": "End on a constructive note about improvement. These are common post-ransomware recommendations.",
+            "expectedActions": [
+              "Review and prioritize recommendations",
+              "Allocate budget for improvements",
+              "Assign ownership for each initiative",
+              "Set timeline expectations"
+            ],
+            "attachments": []
+          }
+        ],
+        "discussionQuestions": [
+          {
+            "id": "q-5-1",
+            "question": "What worked well in your response? What would you do differently?",
+            "category": "lessons_learned",
+            "context": "Reflect on decisions made throughout the exercise.",
+            "responseType": "text",
+            "guidanceNotes": "This is a classic hotwash question. Encourage honest reflection. Both successes and failures are learning opportunities.",
+            "expectedThemes": ["Communication effectiveness", "Decision-making speed", "Coordination challenges", "Resource gaps"],
+            "followUpQuestions": [
+              "Were there any decisions you'd reverse if you could?",
+              "What information would have helped you make better decisions?"
+            ],
+            "suggestedDiscussionTime": 10
+          },
+          {
+            "id": "q-5-2",
+            "question": "What changes to your incident response plan will you make based on this exercise?",
+            "category": "lessons_learned",
+            "responseType": "text",
+            "guidanceNotes": "Push for specific, actionable improvements rather than vague commitments. Ask 'who will do what by when?'",
+            "expectedThemes": ["Plan updates", "Training needs", "Tool gaps", "Communication improvements"],
+            "followUpQuestions": [
+              "How will you ensure these improvements actually get implemented?",
+              "What's the biggest single improvement you could make?"
+            ],
+            "suggestedDiscussionTime": 5
+          },
+          {
+            "id": "q-5-3",
+            "question": "How confident are you in your organization's ability to handle a similar incident tomorrow?",
+            "category": "technical",
+            "responseType": "rating",
+            "guidanceNotes": "This closing question prompts realistic self-assessment. Use it to drive post-exercise action planning.",
+            "expectedThemes": ["Preparedness assessment", "Gap identification", "Resource needs", "Training priorities"],
+            "followUpQuestions": [
+              "What would increase your confidence most?",
+              "What keeps you up at night regarding cybersecurity?"
+            ],
+            "suggestedDiscussionTime": 5
+          }
+        ]
+      }
+    ],
+    "tags": ["ransomware", "healthcare", "HIPAA", "incident-response", "data-breach", "crisis-communication"]
+  }
+}

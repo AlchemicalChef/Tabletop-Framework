@@ -1,0 +1,408 @@
+{
+  "$schema": "https://ctep-framework.org/schema/v1/scenario.json",
+  "scenario": {
+    "id": "bec-ceo-fraud-001",
+    "title": "Business Email Compromise: CEO Fraud",
+    "description": "A finance department employee receives a convincing email appearing to be from the CEO, requesting an urgent wire transfer to a new vendor. This exercise explores social engineering defenses, verification procedures, and incident response when financial fraud is discovered.",
+    "version": "1.0.0",
+    "author": "CTEP Framework",
+    "createdAt": "2024-01-15T00:00:00Z",
+    "updatedAt": "2024-01-15T00:00:00Z",
+    "threatCategory": "phishing",
+    "difficulty": "beginner",
+    "estimatedDuration": 90,
+    "targetAudience": ["Finance/Accounting", "Executive Leadership", "IT Security", "Legal"],
+    "objectives": [
+      "Recognize the hallmarks of business email compromise attacks",
+      "Practice verification procedures for financial requests",
+      "Understand the urgency and pressure tactics used by attackers",
+      "Test incident response procedures for financial fraud"
+    ],
+    "facilitatorGuide": "This scenario is designed for organizations new to tabletop exercises. It's a common attack type that most participants can relate to. Focus on the human factors - the pressure, the urgency, and how social engineering exploits trust and authority. The scenario can end at Module 3 (fraud prevented) or continue to Module 4 (fraud occurred) depending on participant decisions.",
+    "modules": [
+      {
+        "id": "mod-1-initial",
+        "title": "The Urgent Request",
+        "description": "A finance employee receives an urgent email from the 'CEO' requesting a wire transfer.",
+        "phase": "detection",
+        "order": 1,
+        "suggestedDuration": 20,
+        "facilitatorNotes": "Set the scene carefully. The email should feel realistic. Many participants will want to immediately flag it as a scam - push them to consider why someone might fall for it.",
+        "transitionGuidance": "Progress to Module 2 after discussing the initial email and verification procedures.",
+        "injects": [
+          {
+            "id": "inj-1-1",
+            "title": "Email from 'CEO' Arrives",
+            "content": "Sarah Chen, Accounts Payable Specialist, receives the following email at 4:47 PM on a Friday:\n\n---\nFrom: David Morrison <david.morrison@acme-corp.co>\nTo: Sarah Chen <s.chen@acme-corp.com>\nSubject: URGENT - Confidential Wire Transfer\n\nSarah,\n\nI need you to process an urgent wire transfer today. This is for a confidential acquisition we're finalizing over the weekend. The deal falls through if payment isn't received by end of business today.\n\nAmount: $287,500\nBeneficiary: Sterling Consulting Partners LLC\nBank: First National Bank\nRouting: 021000089\nAccount: 4528901234\n\nThis is extremely time-sensitive. Process this immediately and confirm when complete. Do NOT discuss this with anyone - the acquisition is confidential and we can't risk it leaking before the announcement.\n\nI'm in back-to-back board meetings and can't take calls, but I'll check email periodically.\n\nThanks for handling this quickly.\n\nDavid Morrison\nCEO, Acme Corporation\n\nSent from my iPhone\n---\n\nSarah is relatively new (6 months) and has never received a direct request from the CEO before. She's eager to prove herself and knows the CEO values responsiveness.",
+            "type": "information",
+            "severity": "high",
+            "triggerTime": 0,
+            "source": "Suspicious Email",
+            "facilitatorNotes": "Point out the subtle red flags: the slightly different domain (.co vs .com), the Friday afternoon timing, the pressure not to verify, the 'Sent from iPhone' to explain any informality. But also acknowledge why someone might miss these under pressure.",
+            "expectedActions": [
+              "Identify suspicious elements in the email",
+              "Consider verification procedures",
+              "Recognize social engineering tactics"
+            ],
+            "attachments": []
+          },
+          {
+            "id": "inj-1-2",
+            "title": "Time Pressure Escalates",
+            "content": "Fifteen minutes after the first email, Sarah receives a follow-up:\n\n---\nFrom: David Morrison <david.morrison@acme-corp.co>\nTo: Sarah Chen <s.chen@acme-corp.com>\nSubject: Re: URGENT - Confidential Wire Transfer\n\nSarah,\n\nI haven't received confirmation yet. Is there a problem?\n\nThe other party is getting nervous. If we don't complete this today, we lose a $15M acquisition opportunity. I chose you for this because I heard you're reliable and can get things done.\n\nPlease confirm this is being processed NOW.\n\nDavid\n---",
+            "type": "escalation",
+            "severity": "high",
+            "triggerTime": 8,
+            "source": "Follow-up Email",
+            "facilitatorNotes": "This inject increases pressure. Note the emotional manipulation - flattery ('I heard you're reliable'), fear (missing the deal), and urgency.",
+            "expectedActions": [
+              "Resist pressure to act hastily",
+              "Initiate verification process",
+              "Consider notifying supervisor"
+            ],
+            "attachments": []
+          },
+          {
+            "id": "inj-1-3",
+            "title": "Sarah's Dilemma",
+            "content": "Sarah is uncertain. She notices:\n\nSuspicious signs:\n- She doesn't usually receive requests from the CEO\n- The email domain looks slightly off\n- The pressure to keep it confidential feels unusual\n- Friday afternoon timing seems convenient\n\nReassuring signs:\n- The CEO's signature block looks correct\n- The tone matches how executives typically communicate\n- $287,500 isn't huge for the company (annual revenue $50M)\n- She knows the CEO does work on M&A deals\n- Her supervisor Mark left early for a family emergency\n\nSarah's options:\n1. Process the wire (she has authorization for amounts up to $300K)\n2. Try to call the CEO directly (but he said he can't take calls)\n3. Email the CEO back asking for verification\n4. Contact her absent supervisor\n5. Report it as suspicious to IT Security\n6. Wait until Monday (but risk the 'deal')\n\nThe bank's wire cutoff is in 45 minutes.",
+            "type": "decision_point",
+            "severity": "high",
+            "triggerTime": 12,
+            "source": "Scenario",
+            "facilitatorNotes": "Let participants debate what Sarah should do. Explore why each option has pros and cons. The 'right' answer is verification, but understand why people don't always do it.",
+            "expectedActions": [
+              "Identify the best verification method",
+              "Recognize that urgency is an attack tactic",
+              "Understand authorization controls"
+            ],
+            "attachments": []
+          }
+        ],
+        "discussionQuestions": [
+          {
+            "id": "q-1-1",
+            "question": "What red flags should Sarah have noticed in the initial email?",
+            "category": "technical",
+            "responseType": "text",
+            "guidanceNotes": "Key red flags: domain spoofing (.co vs .com), Friday afternoon timing, demand for secrecy, no previous direct contact from CEO, pressure to bypass normal procedures.",
+            "expectedThemes": ["Domain mismatch", "Urgency/pressure", "Secrecy demands", "Unusual request pattern"],
+            "followUpQuestions": [
+              "Would you have noticed all of these under time pressure?",
+              "How can we make red flags more visible to employees?"
+            ],
+            "suggestedDiscussionTime": 5
+          },
+          {
+            "id": "q-1-2",
+            "question": "What verification procedures should exist for large wire transfers?",
+            "category": "policy",
+            "responseType": "text",
+            "guidanceNotes": "Best practices include: callback verification to known numbers, dual authorization, waiting periods for new beneficiaries, out-of-band confirmation for executive requests.",
+            "expectedThemes": ["Callback verification", "Dual control", "Known contact info", "Waiting periods"],
+            "followUpQuestions": [
+              "Do these procedures exist in your organization?",
+              "Are there exceptions for 'urgent' requests?"
+            ],
+            "suggestedDiscussionTime": 7
+          },
+          {
+            "id": "q-1-3",
+            "question": "Why do these attacks work on smart, careful people?",
+            "category": "decision",
+            "context": "BEC attacks cost organizations billions annually, affecting companies of all sizes.",
+            "responseType": "text",
+            "guidanceNotes": "Psychological factors: authority (CEO), urgency (deadline), social proof (flattery), fear (failing the boss), isolation (secrecy requirement). Understanding these helps build better defenses.",
+            "expectedThemes": ["Authority exploitation", "Time pressure", "Fear of failure", "Desire to help"],
+            "followUpQuestions": [
+              "Have you ever felt pressure to skip verification for an executive?",
+              "How do we empower employees to push back on authority?"
+            ],
+            "suggestedDiscussionTime": 5
+          }
+        ]
+      },
+      {
+        "id": "mod-2-verification",
+        "title": "Verification & Investigation",
+        "description": "Attempting to verify the request reveals more about the attack.",
+        "phase": "detection",
+        "order": 2,
+        "suggestedDuration": 20,
+        "facilitatorNotes": "This module shows what happens when verification is attempted. Use it to reinforce the value of verification procedures.",
+        "transitionGuidance": "If participants chose to verify and stop the fraud, proceed to Module 3. If they want to explore what happens when fraud succeeds, you can proceed to Module 4.",
+        "injects": [
+          {
+            "id": "inj-2-1",
+            "title": "Sarah Attempts Verification",
+            "content": "Sarah decides to attempt verification despite the pressure. She:\n\n1. Tries calling the CEO's office: Goes to voicemail (it's after hours for his assistant)\n\n2. Calls the CEO's mobile (from the company directory): \n   CEO David Morrison answers: 'Hello?'\n   Sarah: 'Hi Mr. Morrison, this is Sarah from Accounts Payable. I'm calling to verify a wire transfer request I received from you.'\n   CEO: 'Wire transfer? I haven't sent any wire transfer requests today. I've been in board meetings but I definitely haven't emailed anyone about money. What's going on?'\n\n3. Sarah explains the email:\n   CEO: 'That's not from me. Do NOT process anything. This sounds like one of those business email scams. Can you forward me the email? And we need to get IT Security involved right away. Good job catching this, Sarah.'\n\nThe fraudulent transfer has been prevented.",
+            "type": "information",
+            "severity": "medium",
+            "triggerTime": 0,
+            "source": "Phone Verification",
+            "facilitatorNotes": "This is the successful verification scenario. Emphasize that a simple phone call prevented a $287K loss. Discuss why this almost didn't happen.",
+            "expectedActions": [
+              "Recognize verification as successful prevention",
+              "Initiate incident response",
+              "Preserve evidence"
+            ],
+            "attachments": []
+          },
+          {
+            "id": "inj-2-2",
+            "title": "IT Security Investigation",
+            "content": "IT Security begins investigating the attempted BEC attack:\n\n**Initial Findings (within 1 hour):**\n\n1. Email Analysis:\n   - Sent from domain 'acme-corp.co' (registered 3 days ago)\n   - Domain registered through privacy service in Panama\n   - Email server located in Eastern Europe\n   - SPF/DKIM checks would have failed but email gateway rules weren't strict\n\n2. Reconnaissance Detected:\n   - Attacker appeared to know CEO's name, title, and communication style\n   - Knew Sarah's name and role\n   - Knew the company does M&A activity\n   - Knew supervisor was out (possibly social media monitoring)\n\n3. Additional Targets Identified:\n   - Similar emails sent to two other AP staff (not yet opened)\n   - One email sent to CFO's executive assistant\n\n4. Source of Information:\n   - Company org chart publicly available on website\n   - CEO's travel mentioned in LinkedIn post\n   - Supervisor's absence mentioned in his out-of-office reply\n\n**Recommended Actions:**\n   - Block the spoofed domain at email gateway\n   - Alert all finance staff immediately\n   - Enable stricter email authentication checks\n   - Report to FBI IC3 (Internet Crime Complaint Center)",
+            "type": "information",
+            "severity": "medium",
+            "triggerTime": 10,
+            "source": "IT Security Team",
+            "facilitatorNotes": "This inject shows the investigation aftermath. Discuss how much reconnaissance went into this attack - it was not random.",
+            "expectedActions": [
+              "Block malicious domain",
+              "Alert potential targets",
+              "Preserve evidence",
+              "Consider law enforcement report"
+            ],
+            "attachments": []
+          }
+        ],
+        "discussionQuestions": [
+          {
+            "id": "q-2-1",
+            "question": "How did the attacker know so much about your organization?",
+            "category": "technical",
+            "responseType": "text",
+            "guidanceNotes": "Attackers use OSINT (open source intelligence): LinkedIn, company websites, SEC filings, social media, out-of-office messages, conference attendee lists, etc.",
+            "expectedThemes": ["LinkedIn exposure", "Website information", "Social media", "Out-of-office messages"],
+            "followUpQuestions": [
+              "What information about your organization is publicly available?",
+              "Should you limit what's posted publicly?"
+            ],
+            "suggestedDiscussionTime": 5
+          },
+          {
+            "id": "q-2-2",
+            "question": "What technical controls could have caught this email?",
+            "category": "technical",
+            "responseType": "text",
+            "guidanceNotes": "Controls include: strict SPF/DKIM/DMARC, lookalike domain detection, external email banners, impersonation protection, display name analysis.",
+            "expectedThemes": ["Email authentication", "Lookalike detection", "External warnings", "Display name checks"],
+            "followUpQuestions": [
+              "Which of these controls do you currently have?",
+              "Why might organizations not implement all of these?"
+            ],
+            "suggestedDiscussionTime": 5
+          },
+          {
+            "id": "q-2-3",
+            "question": "Should you report this to law enforcement even though no money was lost?",
+            "category": "policy",
+            "responseType": "text",
+            "guidanceNotes": "Yes - FBI IC3 reports help build cases against threat actors and identify trends. Even unsuccessful attacks should be reported to help others.",
+            "expectedThemes": ["IC3 reporting", "Pattern identification", "Helping others", "No negative consequence"],
+            "followUpQuestions": [
+              "Have you ever reported a cybercrime to IC3?",
+              "What barriers exist to reporting?"
+            ],
+            "suggestedDiscussionTime": 3
+          }
+        ]
+      },
+      {
+        "id": "mod-3-prevention",
+        "title": "Strengthening Defenses",
+        "description": "Implementing controls to prevent future BEC attacks.",
+        "phase": "recovery",
+        "order": 3,
+        "suggestedDuration": 20,
+        "facilitatorNotes": "This module focuses on prevention and improvement. Good place to end if the fraud was prevented.",
+        "transitionGuidance": "If the exercise ends here, move to lessons learned. If exploring the fraud scenario, proceed to Module 4.",
+        "injects": [
+          {
+            "id": "inj-3-1",
+            "title": "CFO Requests Action Plan",
+            "content": "The CFO has scheduled a meeting for Monday morning:\n\n'I'm glad we caught this one, but I'm concerned about next time. I want an action plan on my desk covering:\n\n1. Immediate actions (this week):\n   - What are we doing right now to prevent another attempt?\n   \n2. Short-term improvements (30 days):\n   - Process changes for financial requests\n   - Technical controls enhancement\n   - Staff awareness\n   \n3. Verification procedures:\n   - Clear, documented process for verifying unusual requests\n   - Must work even when executives claim urgency\n   - Can't create friction that stops legitimate business\n\n4. Training plan:\n   - How do we make sure every finance employee knows about this?\n   - How do we test whether they'd fall for it?\n\nI want to present this to the Board's Audit Committee next week. They're going to ask whether we have this under control.'",
+            "type": "information",
+            "severity": "low",
+            "triggerTime": 0,
+            "source": "Chief Financial Officer",
+            "facilitatorNotes": "This inject drives action planning. Have participants develop actual recommendations.",
+            "expectedActions": [
+              "Develop immediate action items",
+              "Plan process improvements",
+              "Design verification procedures",
+              "Create training program"
+            ],
+            "attachments": []
+          },
+          {
+            "id": "inj-3-2",
+            "title": "Proposed Verification Procedure",
+            "content": "The Controller proposes a new wire transfer verification procedure:\n\n**PROPOSED: Executive Payment Request Verification Protocol**\n\n1. ANY payment request claiming to be from C-suite requires verification:\n   - Regardless of amount\n   - Regardless of claimed urgency\n   - No exceptions\n\n2. Verification steps:\n   a. Call the executive at their KNOWN phone number (from directory, not from email)\n   b. If unavailable, escalate to CFO or Controller\n   c. For requests over $50K, require two-person verification\n   d. For new beneficiaries, 24-hour waiting period\n\n3. Executives agree to:\n   - Never request payments be processed urgently without prior arrangement\n   - Never request staff bypass verification procedures\n   - Accept that verification delays are expected and acceptable\n\n4. Staff empowerment:\n   - Employees may decline ANY request they find suspicious\n   - No negative consequences for good-faith verification delays\n   - Report all suspicious requests to IT Security\n\n**Questions for discussion:**\n- Is the $50K threshold appropriate?\n- Is 24 hours too long for new beneficiaries?\n- How do we handle legitimate urgent situations?\n- Will executives actually follow this?",
+            "type": "decision_point",
+            "severity": "low",
+            "triggerTime": 10,
+            "source": "Controller",
+            "facilitatorNotes": "These are realistic controls. Discuss the trade-offs between security and operational efficiency. Push on whether executives will actually comply.",
+            "expectedActions": [
+              "Evaluate proposed procedures",
+              "Identify gaps or concerns",
+              "Consider implementation challenges",
+              "Gain executive buy-in"
+            ],
+            "attachments": []
+          }
+        ],
+        "discussionQuestions": [
+          {
+            "id": "q-3-1",
+            "question": "Will executives actually follow verification procedures when they're in a hurry?",
+            "category": "policy",
+            "context": "Executive buy-in is critical but often difficult to maintain when it creates friction.",
+            "responseType": "text",
+            "guidanceNotes": "This is the key question. Controls fail when leaders bypass them. Discuss how to get genuine executive commitment, not just policy approval.",
+            "expectedThemes": ["Executive modeling", "Consistent enforcement", "Cultural change", "Consequences for bypass"],
+            "followUpQuestions": [
+              "What happens when a VP says 'just this once, it's urgent'?",
+              "How do you enforce policies on the CEO?"
+            ],
+            "suggestedDiscussionTime": 7
+          },
+          {
+            "id": "q-3-2",
+            "question": "How do you train employees to be suspicious without making them paranoid or slowing down legitimate work?",
+            "category": "coordination",
+            "responseType": "text",
+            "guidanceNotes": "Balance is key. Training should focus on specific scenarios and verification steps rather than general suspicion. Regular simulated phishing tests help maintain awareness.",
+            "expectedThemes": ["Scenario-based training", "Clear procedures", "Phishing simulations", "Positive reinforcement"],
+            "followUpQuestions": [
+              "How often should you run phishing simulations?",
+              "What happens when someone fails a simulation?"
+            ],
+            "suggestedDiscussionTime": 5
+          },
+          {
+            "id": "q-3-3",
+            "question": "What would you do differently in your organization based on this scenario?",
+            "category": "lessons_learned",
+            "responseType": "text",
+            "guidanceNotes": "Push for specific, actionable commitments. General 'we should be more careful' is not sufficient.",
+            "expectedThemes": ["Specific procedure changes", "Training initiatives", "Technical controls", "Policy updates"],
+            "followUpQuestions": [
+              "Who will own this improvement?",
+              "What's your timeline?"
+            ],
+            "suggestedDiscussionTime": 5
+          }
+        ]
+      },
+      {
+        "id": "mod-4-fraud-occurred",
+        "title": "The Wire Was Sent (Alternate)",
+        "description": "Optional module exploring what happens when the fraudulent wire transfer is processed.",
+        "phase": "containment",
+        "order": 4,
+        "suggestedDuration": 25,
+        "facilitatorNotes": "This is an ALTERNATE scenario where Sarah sent the wire. Use this if you want to explore incident response to successful fraud. Can be skipped if Module 2-3 path was taken.",
+        "transitionGuidance": "After this module, return to Module 3's improvement discussion.",
+        "injects": [
+          {
+            "id": "inj-4-1",
+            "title": "Fraud Discovered Monday Morning",
+            "content": "It's Monday morning. Sarah comes to work and sees a news article about BEC scams. With growing dread, she pulls up Friday's wire transfer confirmation.\n\nShe tries to reach the 'CEO' at the email address - it bounces.\n\nShe calls the CEO's real number:\n\nCEO: 'What wire transfer? I never sent any email about a wire transfer. Oh no. How much?'\n\nSarah: '$287,500. I'm so sorry, I thought it was really you, the email looked legitimate and you said it was urgent and confidential and...'\n\nCEO: 'Sarah, take a breath. This isn't your fault - these scams are sophisticated. But we need to act fast. Get the CFO and IT Security in my office immediately. And call the bank - there might still be time to recall the wire.'\n\nThe money was sent Friday at 4:52 PM. It's now Monday at 8:45 AM - over 60 hours have passed.",
+            "type": "escalation",
+            "severity": "critical",
+            "triggerTime": 0,
+            "source": "Scenario",
+            "facilitatorNotes": "This is the 'fraud succeeded' scenario. Note the CEO's response - no blame, immediate action focus. Discuss whether this is the right approach.",
+            "expectedActions": [
+              "Contact bank immediately for wire recall",
+              "Preserve all evidence",
+              "Notify IT Security",
+              "Begin incident response"
+            ],
+            "attachments": []
+          },
+          {
+            "id": "inj-4-2",
+            "title": "Bank Response",
+            "content": "The CFO calls the bank's wire fraud hotline:\n\nBank Rep: 'I'm pulling up the transaction now. The wire for $287,500 was processed Friday at 4:52 PM and settled same day. The funds were received by First National Bank.\n\nWe've initiated a recall request, but I have to be honest with you - success rates for wire recalls after 24 hours are very low. The receiving bank has the funds, but whether they can freeze them depends on:\n- Whether the beneficiary account still has the funds\n- Whether the receiving bank will cooperate\n- Whether there's a legal hold in place\n\nIn BEC cases, funds are typically moved within hours to other accounts, often overseas. By Monday morning, the money has usually been moved several times.\n\nWe'll do everything we can, but you should prepare for the possibility that these funds are not recoverable. I'm also required to file a Suspicious Activity Report.\n\nYou should contact:\n1. FBI Internet Crime Complaint Center (IC3)\n2. Your cyber insurance carrier\n3. Your legal counsel\n\nI'm sorry. We see these cases more often than we'd like.'",
+            "type": "information",
+            "severity": "critical",
+            "triggerTime": 5,
+            "source": "Bank Wire Fraud Department",
+            "facilitatorNotes": "Wire recovery success rates after 24-48 hours are around 20-30%. After a weekend, it's even lower. Be realistic about the likely outcome.",
+            "expectedActions": [
+              "File recall request",
+              "Report to FBI IC3",
+              "Contact cyber insurance",
+              "Prepare for likely loss"
+            ],
+            "attachments": []
+          },
+          {
+            "id": "inj-4-3",
+            "title": "Internal Fallout",
+            "content": "The CFO convenes the leadership team:\n\n'Here's where we stand:\n\n- $287,500 sent to fraudulent account\n- Bank attempting recall but low probability of success\n- FBI IC3 report filed\n- Insurance claim initiated ($50K deductible, but BEC may be covered)\n\nWe need to address several things:\n\n1. Sarah: She's devastated and has offered her resignation. Do we accept it?\n\n2. Process failure: Our controls failed. Who else has wire authorization? Could this happen again?\n\n3. Supervisor: Sarah's supervisor was out. Should there be coverage requirements?\n\n4. Communication: Do we disclose this? To whom?\n\n5. Recovery: Is there anything else we can do to recover the funds?\n\nI want honest discussion. Blaming individuals doesn't help, but we need to understand what failed and fix it.'",
+            "type": "decision_point",
+            "severity": "high",
+            "triggerTime": 12,
+            "source": "CFO",
+            "facilitatorNotes": "This inject raises several management decisions. The question of whether to fire Sarah often generates strong discussion. There's no single right answer.",
+            "expectedActions": [
+              "Address personnel decisions thoughtfully",
+              "Identify systemic failures",
+              "Implement immediate controls",
+              "Plan communication strategy"
+            ],
+            "attachments": []
+          }
+        ],
+        "discussionQuestions": [
+          {
+            "id": "q-4-1",
+            "question": "Should Sarah be fired? What factors should influence this decision?",
+            "category": "decision",
+            "context": "Sarah followed a request she believed came from the CEO. She had authorization for amounts up to $300K. She was relatively new and trying to prove herself.",
+            "responseType": "text",
+            "guidanceNotes": "This is a values discussion. Consider: Was this a systemic failure or individual failure? What message does firing send to others? Would firing prevent future incidents or just make people hide mistakes?",
+            "expectedThemes": ["Systemic vs individual failure", "Blame culture problems", "Learning opportunity", "Future prevention"],
+            "followUpQuestions": [
+              "What if Sarah had been warned about BEC scams before?",
+              "What if Sarah had bypassed explicit verification procedures?",
+              "How does your organization typically handle honest mistakes?"
+            ],
+            "suggestedDiscussionTime": 10
+          },
+          {
+            "id": "q-4-2",
+            "question": "Do you disclose this incident publicly? To employees? To the board?",
+            "category": "communication",
+            "responseType": "text",
+            "guidanceNotes": "Different stakeholders need different communication. Board must know (fiduciary duty). Employees should know (prevention). Public disclosure is usually not required for BEC unless it involves customer data.",
+            "expectedThemes": ["Board notification required", "Employee awareness value", "Public disclosure considerations", "Learning opportunity"],
+            "followUpQuestions": [
+              "What if an employee posts about it on social media?",
+              "How do you prevent panic while promoting awareness?"
+            ],
+            "suggestedDiscussionTime": 5
+          },
+          {
+            "id": "q-4-3",
+            "question": "What is the true cost of this incident beyond the $287K?",
+            "category": "resource",
+            "responseType": "text",
+            "guidanceNotes": "Hidden costs include: investigation time, legal fees, insurance deductible, management distraction, employee morale, process redesign, training, potential liability, reputational impact.",
+            "expectedThemes": ["Investigation costs", "Management time", "Process remediation", "Training costs", "Morale impact"],
+            "followUpQuestions": [
+              "How do you calculate ROI on BEC prevention controls?",
+              "Would you have invested in prevention before this happened?"
+            ],
+            "suggestedDiscussionTime": 5
+          }
+        ]
+      }
+    ],
+    "tags": ["BEC", "CEO-fraud", "social-engineering", "wire-fraud", "phishing", "financial"]
+  }
+}
