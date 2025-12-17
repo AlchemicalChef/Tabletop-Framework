@@ -546,6 +546,7 @@ export default function ScenarioAuthorPage({ onNavigate }: ScenarioAuthorPagePro
                     <ModuleEditor
                       key={module.id}
                       module={module}
+                      allModules={currentScenario.modules}
                       isExpanded={expandedModuleId === module.id}
                       onToggleExpand={() => setExpandedModuleId(
                         expandedModuleId === module.id ? null : module.id

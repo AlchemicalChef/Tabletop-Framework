@@ -5,6 +5,7 @@ import QuestionEditor from './QuestionEditor'
 
 interface ModuleEditorProps {
   module: Module
+  allModules: Module[]
   isExpanded: boolean
   onToggleExpand: () => void
   onUpdate: (updates: Partial<Module>) => void
@@ -37,6 +38,7 @@ const PHASE_COLORS: Record<ModulePhase, string> = {
 
 export default function ModuleEditor({
   module,
+  allModules,
   isExpanded,
   onToggleExpand,
   onUpdate,
@@ -301,6 +303,8 @@ export default function ModuleEditor({
                         key={inject.id}
                         inject={inject}
                         index={index}
+                        modules={allModules}
+                        currentModuleId={module.id}
                         onUpdate={(updates) => onUpdateInject(inject.id, updates)}
                         onDelete={() => onDeleteInject(inject.id)}
                       />

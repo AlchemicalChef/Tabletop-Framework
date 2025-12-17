@@ -1,11 +1,19 @@
 import { useState } from 'react'
-import type { Exercise, ParticipantResponse } from '../../types/exercise.types'
+import type { Exercise, ParticipantResponse, FacilitatorNote, NoteCategory } from '../../types/exercise.types'
 import type { Scenario, Module } from '../../types/scenario.types'
 
 interface AARGeneratorProps {
   exercise: Exercise
   scenario: Scenario
+  facilitatorNotes?: FacilitatorNote[]
   onClose: () => void
+}
+
+const NOTE_CATEGORY_LABELS: Record<NoteCategory, string> = {
+  observation: 'Observation',
+  action_item: 'Action Item',
+  follow_up: 'Follow-up',
+  general: 'General'
 }
 
 interface AARData {
@@ -18,11 +26,12 @@ interface AARData {
     modulesCompleted: number
     totalModules: number
     totalResponses: number
+    totalNotes: number
   }
   timeline: {
     time: string
     event: string
-    type: 'inject' | 'response' | 'milestone'
+    type: 'inject' | 'response' | 'milestone' | 'note'
     details?: string
   }[]
   moduleReviews: {
@@ -35,6 +44,12 @@ interface AARData {
       question: string
       responses: string[]
     }[]
+  }[]
+  facilitatorNotes: {
+    timestamp: string
+    category: string
+    content: string
+    moduleId: string
   }[]
   keyFindings: string[]
   recommendations: string[]
@@ -53,8 +68,8 @@ function formatTimestamp(iso: string): string {
   return new Date(iso).toLocaleString()
 }
 
-export default function AARGenerator({ exercise, scenario, onClose }: AARGeneratorProps) {
-  const [activeTab, setActiveTab] = useState<'summary' | 'timeline' | 'responses' | 'export'>('summary')
+export default function AARGenerator({ exercise, scenario, facilitatorNotes = [], onClose }: AARGeneratorProps) {
+  const [activeTab, setActiveTab] = useState<'summary' | 'timeline' | 'responses' | 'notes' | 'export'>('summary')
   const [isExporting, setIsExporting] = useState(false)
 
   // Generate AAR data
@@ -105,6 +120,16 @@ export default function AARGenerator({ exercise, scenario, onClose }: AARGenerat
       }
     })
 
+    // Add facilitator notes to timeline
+    facilitatorNotes.forEach(note => {
+      timeline.push({
+        time: formatTimestamp(note.createdAt),
+        event: `Note: ${NOTE_CATEGORY_LABELS[note.category]}`,
+        type: 'note',
+        details: note.content.substring(0, 80) + (note.content.length > 80 ? '...' : '')
+      })
+    })
+
     // Sort timeline by time
     timeline.sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime())
 
@@ -146,6 +171,11 @@ export default function AARGenerator({ exercise, scenario, onClose }: AARGenerat
       const acknowledgedCount = exercise.injectLogs.filter(l => l.acknowledgedAt).length
       keyFindings.push(`${acknowledgedCount} of ${exercise.injectLogs.length} injects were formally acknowledged.`)
     }
+    if (facilitatorNotes.length > 0) {
+      const actionItems = facilitatorNotes.filter(n => n.category === 'action_item').length
+      const followUps = facilitatorNotes.filter(n => n.category === 'follow_up').length
+      keyFindings.push(`${facilitatorNotes.length} facilitator notes were recorded (${actionItems} action items, ${followUps} follow-ups).`)
+    }
 
     // Generate recommendations (placeholder)
     const recommendations: string[] = [
@@ -154,6 +184,14 @@ export default function AARGenerator({ exercise, scenario, onClose }: AARGenerat
       'Schedule follow-up training for areas where uncertainty was expressed.',
       'Update incident response procedures based on lessons learned.'
     ]
+
+    // Format facilitator notes for export
+    const formattedNotes = facilitatorNotes.map(note => ({
+      timestamp: formatTimestamp(note.createdAt),
+      category: NOTE_CATEGORY_LABELS[note.category],
+      content: note.content,
+      moduleId: note.moduleId
+    }))
 
     return {
       summary: {
@@ -164,10 +202,12 @@ export default function AARGenerator({ exercise, scenario, onClose }: AARGenerat
         status: exercise.status,
         modulesCompleted: exercise.progress.completedModules.length,
         totalModules: scenario.modules.length,
-        totalResponses: exercise.responses.length
+        totalResponses: exercise.responses.length,
+        totalNotes: facilitatorNotes.length
       },
       timeline,
       moduleReviews,
+      facilitatorNotes: formattedNotes,
       keyFindings,
       recommendations
     }
@@ -252,6 +292,17 @@ export default function AARGenerator({ exercise, scenario, onClose }: AARGenerat
     .response-block { background: white; padding: 1rem; border-radius: 4px; margin-top: 0.5rem; border: 1px solid #e2e8f0; }
     .question { font-weight: 500; margin-bottom: 0.5rem; }
     .response { background: #edf2f7; padding: 0.75rem; border-radius: 4px; margin-top: 0.25rem; font-size: 0.875rem; }
+    .note { background: #f7fafc; padding: 1rem; border-radius: 8px; margin-bottom: 0.5rem; }
+    .note-observation { border-left: 4px solid #4299e1; }
+    .note-action { border-left: 4px solid #f56565; }
+    .note-followup { border-left: 4px solid #ed8936; }
+    .note-general { border-left: 4px solid #a0aec0; }
+    .note-meta { font-size: 0.75rem; color: #718096; margin-bottom: 0.5rem; }
+    .note-category { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 500; }
+    .category-observation { background: rgba(66, 153, 225, 0.15); color: #4299e1; }
+    .category-action { background: rgba(245, 101, 101, 0.15); color: #f56565; }
+    .category-followup { background: rgba(237, 137, 54, 0.15); color: #ed8936; }
+    .category-general { background: #edf2f7; color: #718096; }
     .timeline-item { display: flex; gap: 1rem; padding: 0.75rem 0; border-bottom: 1px solid #e2e8f0; }
     .timeline-time { font-size: 0.75rem; color: #718096; min-width: 140px; }
     .timeline-event { flex: 1; }
@@ -285,6 +336,10 @@ export default function AARGenerator({ exercise, scenario, onClose }: AARGenerat
       <div class="meta-label">Responses</div>
       <div class="meta-value">${data.summary.totalResponses}</div>
     </div>
+    <div class="meta-item">
+      <div class="meta-label">Notes</div>
+      <div class="meta-value">${data.summary.totalNotes}</div>
+    </div>
   </div>
 
   <h2>Executive Summary</h2>
@@ -314,6 +369,24 @@ export default function AARGenerator({ exercise, scenario, onClose }: AARGenerat
     ` : '<p style="color: #718096; font-style: italic;">No responses recorded for this module.</p>'}
   </div>
   `).join('\n  ')}
+
+  ${data.facilitatorNotes.length > 0 ? `
+  <h2>Facilitator Notes</h2>
+  <p style="margin-bottom: 1rem; color: #718096;">Notes captured by the facilitator during the exercise.</p>
+  ${data.facilitatorNotes.map(note => {
+    const categoryClass = note.category === 'Action Item' ? 'action' :
+                         note.category === 'Follow-up' ? 'followup' :
+                         note.category === 'Observation' ? 'observation' : 'general'
+    return `
+  <div class="note note-${categoryClass}">
+    <div class="note-meta">
+      <span>${note.timestamp}</span>
+      <span class="note-category category-${categoryClass}">${note.category}</span>
+    </div>
+    <p>${note.content}</p>
+  </div>`
+  }).join('\n  ')}
+  ` : ''}
 
   ${data.timeline.length > 0 ? `
   <h2>Exercise Timeline</h2>
@@ -394,7 +467,7 @@ export default function AARGenerator({ exercise, scenario, onClose }: AARGenerat
           padding: 'var(--spacing-sm) var(--spacing-lg)',
           backgroundColor: 'var(--color-bg-tertiary)'
         }}>
-          {(['summary', 'timeline', 'responses', 'export'] as const).map(tab => (
+          {(['summary', 'timeline', 'responses', 'notes', 'export'] as const).map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -422,7 +495,7 @@ export default function AARGenerator({ exercise, scenario, onClose }: AARGenerat
               {/* Stats Grid */}
               <div style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(4, 1fr)',
+                gridTemplateColumns: 'repeat(5, 1fr)',
                 gap: 'var(--spacing-md)',
                 marginBottom: 'var(--spacing-lg)'
               }}>
@@ -471,6 +544,17 @@ export default function AARGenerator({ exercise, scenario, onClose }: AARGenerat
                     Responses
                   </div>
                   <div style={{ fontSize: '1.25rem', fontWeight: 600 }}>{aarData.summary.totalResponses}</div>
+                </div>
+                <div style={{
+                  padding: 'var(--spacing-md)',
+                  backgroundColor: 'var(--color-bg-secondary)',
+                  borderRadius: 'var(--radius-md)',
+                  textAlign: 'center'
+                }}>
+                  <div style={{ fontSize: '0.625rem', color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>
+                    Notes
+                  </div>
+                  <div style={{ fontSize: '1.25rem', fontWeight: 600 }}>{aarData.summary.totalNotes}</div>
                 </div>
               </div>
 
@@ -625,6 +709,112 @@ export default function AARGenerator({ exercise, scenario, onClose }: AARGenerat
                   )}
                 </div>
               ))}
+            </div>
+          )}
+
+          {activeTab === 'notes' && (
+            <div>
+              {aarData.facilitatorNotes.length === 0 ? (
+                <p style={{ color: 'var(--color-text-muted)', textAlign: 'center', padding: 'var(--spacing-xl)' }}>
+                  No facilitator notes were recorded during the exercise.
+                </p>
+              ) : (
+                <>
+                  {/* Notes by Category Summary */}
+                  <div style={{
+                    display: 'flex',
+                    gap: 'var(--spacing-sm)',
+                    marginBottom: 'var(--spacing-lg)',
+                    flexWrap: 'wrap'
+                  }}>
+                    {(['Observation', 'Action Item', 'Follow-up', 'General'] as const).map(category => {
+                      const count = aarData.facilitatorNotes.filter(n => n.category === category).length
+                      if (count === 0) return null
+                      return (
+                        <span
+                          key={category}
+                          style={{
+                            padding: '4px 12px',
+                            backgroundColor: category === 'Action Item' ? 'rgba(245, 101, 101, 0.15)' :
+                                           category === 'Follow-up' ? 'rgba(237, 137, 54, 0.15)' :
+                                           category === 'Observation' ? 'rgba(66, 153, 225, 0.15)' :
+                                           'var(--color-bg-tertiary)',
+                            color: category === 'Action Item' ? '#f56565' :
+                                  category === 'Follow-up' ? '#ed8936' :
+                                  category === 'Observation' ? '#4299e1' :
+                                  'var(--color-text-secondary)',
+                            borderRadius: 'var(--radius-full)',
+                            fontSize: '0.75rem',
+                            fontWeight: 500
+                          }}
+                        >
+                          {count} {category}{count !== 1 ? 's' : ''}
+                        </span>
+                      )
+                    })}
+                  </div>
+
+                  {/* Notes List */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
+                    {aarData.facilitatorNotes.map((note, i) => (
+                      <div
+                        key={i}
+                        style={{
+                          padding: 'var(--spacing-md)',
+                          backgroundColor: 'var(--color-bg-secondary)',
+                          borderRadius: 'var(--radius-md)',
+                          borderLeft: `4px solid ${
+                            note.category === 'Action Item' ? '#f56565' :
+                            note.category === 'Follow-up' ? '#ed8936' :
+                            note.category === 'Observation' ? '#4299e1' :
+                            '#a0aec0'
+                          }`
+                        }}
+                      >
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 'var(--spacing-sm)',
+                          marginBottom: 'var(--spacing-xs)'
+                        }}>
+                          <span style={{
+                            fontSize: '0.625rem',
+                            color: 'var(--color-text-muted)',
+                            fontFamily: 'var(--font-mono)'
+                          }}>
+                            {note.timestamp}
+                          </span>
+                          <span style={{
+                            padding: '2px 6px',
+                            backgroundColor: note.category === 'Action Item' ? 'rgba(245, 101, 101, 0.15)' :
+                                           note.category === 'Follow-up' ? 'rgba(237, 137, 54, 0.15)' :
+                                           note.category === 'Observation' ? 'rgba(66, 153, 225, 0.15)' :
+                                           'var(--color-bg-tertiary)',
+                            color: note.category === 'Action Item' ? '#f56565' :
+                                  note.category === 'Follow-up' ? '#ed8936' :
+                                  note.category === 'Observation' ? '#4299e1' :
+                                  'var(--color-text-secondary)',
+                            borderRadius: 'var(--radius-sm)',
+                            fontSize: '0.625rem',
+                            fontWeight: 500
+                          }}>
+                            {note.category}
+                          </span>
+                        </div>
+                        <p style={{
+                          margin: 0,
+                          fontSize: '0.875rem',
+                          color: 'var(--color-text-primary)',
+                          lineHeight: 1.5,
+                          whiteSpace: 'pre-wrap'
+                        }}>
+                          {note.content}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
           )}
 

@@ -11,6 +11,10 @@ import DiscussionPanel from '../components/exercise/DiscussionPanel'
 import ExportParticipantModal from '../components/exercise/ExportParticipantModal'
 import ImportResponsesModal from '../components/exercise/ImportResponsesModal'
 import AARGenerator from '../components/exercise/AARGenerator'
+import BranchSelector from '../components/exercise/BranchSelector'
+import BranchHistory from '../components/exercise/BranchHistory'
+import FacilitatorNotes from '../components/exercise/FacilitatorNotes'
+import FacilitatorChecklist from '../components/exercise/FacilitatorChecklist'
 
 type View = 'home' | 'author' | 'runner' | 'library' | 'participant'
 
@@ -25,6 +29,9 @@ export default function ExerciseRunnerPage({ onNavigate }: ExerciseRunnerPagePro
     isRunning,
     elapsedTime,
     moduleElapsedTime,
+    pendingBranchOptions,
+    branchSelectionMode,
+    facilitatorNotes,
     createExercise,
     loadExercise,
     startExercise,
@@ -38,7 +45,23 @@ export default function ExerciseRunnerPage({ onNavigate }: ExerciseRunnerPagePro
     goToInject,
     logInjectDisplay,
     acknowledgeInject,
-    submitResponse
+    submitResponse,
+    selectBranch,
+    skipBranchDecision,
+    revertToBeforeBranch,
+    addNote,
+    updateNote,
+    deleteNote,
+    discussionStates,
+    startDiscussion,
+    concludeDiscussion,
+    addKeyTheme,
+    removeKeyTheme,
+    highlightResponse,
+    unhighlightResponse,
+    checklist,
+    toggleChecklistItem,
+    resetChecklist
   } = useExerciseStore()
 
   const { currentScenario } = useScenarioStore()
@@ -48,6 +71,7 @@ export default function ExerciseRunnerPage({ onNavigate }: ExerciseRunnerPagePro
   const [showExportModal, setShowExportModal] = useState(false)
   const [showImportModal, setShowImportModal] = useState(false)
   const [showAARModal, setShowAARModal] = useState(false)
+  const [showBranchSelector, setShowBranchSelector] = useState(false)
 
   // Get current module and inject
   const currentModule = linkedScenario?.modules.find(
@@ -66,6 +90,26 @@ export default function ExerciseRunnerPage({ onNavigate }: ExerciseRunnerPagePro
   const canAdvanceInject = currentInjectIndex < totalInjectsInModule - 1
   const canAdvanceModule = currentModuleIndex < totalModules - 1
   const canGoBack = currentInjectIndex > 0 || currentModuleIndex > 0
+
+  // Branching state
+  const hasBranches = currentInject?.branches && currentInject.branches.length > 0
+  const isPendingBranch = branchSelectionMode === 'awaiting'
+  const branchingSettings = linkedScenario?.branchingSettings
+
+  // Handle branch selection
+  const handleSelectBranch = (branchId: string) => {
+    selectBranch(branchId, 'facilitator')
+    setShowBranchSelector(false)
+  }
+
+  const handleSkipBranch = () => {
+    skipBranchDecision()
+    setShowBranchSelector(false)
+  }
+
+  const handleOpenBranchSelector = () => {
+    setShowBranchSelector(true)
+  }
 
   // Log inject display when it changes
   useEffect(() => {
@@ -293,6 +337,8 @@ export default function ExerciseRunnerPage({ onNavigate }: ExerciseRunnerPagePro
             elapsedSeconds={moduleElapsedTime}
             isRunning={isRunning}
             label="Module"
+            suggestedDurationMinutes={currentModule?.suggestedDuration}
+            showWarnings={true}
           />
           <Timer
             elapsedSeconds={elapsedTime}
@@ -314,6 +360,8 @@ export default function ExerciseRunnerPage({ onNavigate }: ExerciseRunnerPagePro
           canAdvanceInject={canAdvanceInject}
           canAdvanceModule={canAdvanceModule}
           canGoBack={canGoBack}
+          hasPendingBranch={hasBranches}
+          branchSelectionMode={branchSelectionMode}
           onStart={startExercise}
           onPause={pauseExercise}
           onResume={resumeExercise}
@@ -321,6 +369,7 @@ export default function ExerciseRunnerPage({ onNavigate }: ExerciseRunnerPagePro
           onAdvanceInject={advanceToNextInject}
           onAdvanceModule={advanceToNextModule}
           onPreviousInject={handlePreviousInject}
+          onOpenBranchSelector={handleOpenBranchSelector}
         />
       </div>
 
@@ -367,6 +416,8 @@ export default function ExerciseRunnerPage({ onNavigate }: ExerciseRunnerPagePro
               showFacilitatorNotes={true}
               onAcknowledge={() => currentInject && acknowledgeInject(currentInject.id)}
               isAcknowledged={isInjectAcknowledged}
+              hasBranches={hasBranches}
+              pendingBranchDecision={isPendingBranch}
             />
           )}
 
@@ -381,6 +432,13 @@ export default function ExerciseRunnerPage({ onNavigate }: ExerciseRunnerPagePro
               showFacilitatorNotes={true}
               onQuestionSelect={setCurrentQuestionIndex}
               onAddResponse={handleAddResponse}
+              discussionStates={discussionStates}
+              onStartDiscussion={startDiscussion}
+              onConcludeDiscussion={concludeDiscussion}
+              onAddKeyTheme={addKeyTheme}
+              onRemoveKeyTheme={removeKeyTheme}
+              onHighlightResponse={highlightResponse}
+              onUnhighlightResponse={unhighlightResponse}
             />
           )}
         </div>
@@ -424,7 +482,40 @@ export default function ExerciseRunnerPage({ onNavigate }: ExerciseRunnerPagePro
             </div>
           </div>
 
-          {/* Facilitator Notes */}
+          {/* Branch History */}
+          {branchingSettings?.showBranchHistory && currentExercise.progress.branchHistory.length > 0 && (
+            <div style={{ marginBottom: 'var(--spacing-md)' }}>
+              <BranchHistory
+                branchHistory={currentExercise.progress.branchHistory}
+                modules={linkedScenario.modules}
+                allowBacktracking={branchingSettings.allowBacktracking}
+                onRevert={revertToBeforeBranch}
+              />
+            </div>
+          )}
+
+          {/* Live Note-Taking */}
+          <div style={{ marginBottom: 'var(--spacing-md)' }}>
+            <FacilitatorNotes
+              notes={facilitatorNotes}
+              elapsedTime={elapsedTime}
+              onAddNote={addNote}
+              onUpdateNote={updateNote}
+              onDeleteNote={deleteNote}
+            />
+          </div>
+
+          {/* Facilitator Checklist */}
+          <div style={{ marginBottom: 'var(--spacing-md)' }}>
+            <FacilitatorChecklist
+              checklist={checklist}
+              onToggleItem={toggleChecklistItem}
+              onReset={resetChecklist}
+              exerciseStatus={currentExercise.status}
+            />
+          </div>
+
+          {/* Module Notes (from scenario) */}
           {currentModule?.facilitatorNotes && (
             <div style={{
               backgroundColor: 'rgba(159, 122, 234, 0.1)',
@@ -545,7 +636,19 @@ export default function ExerciseRunnerPage({ onNavigate }: ExerciseRunnerPagePro
         <AARGenerator
           exercise={currentExercise}
           scenario={linkedScenario}
+          facilitatorNotes={facilitatorNotes}
           onClose={() => setShowAARModal(false)}
+        />
+      )}
+
+      {/* Branch Selector Modal */}
+      {showBranchSelector && currentInject && pendingBranchOptions && (
+        <BranchSelector
+          inject={currentInject}
+          branchOptions={pendingBranchOptions}
+          onSelectBranch={handleSelectBranch}
+          onSkip={handleSkipBranch}
+          showFacilitatorNotes={true}
         />
       )}
     </div>

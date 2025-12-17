@@ -5,13 +5,17 @@ import type {
   Module,
   Inject,
   DiscussionQuestion,
-  SupportingMaterial
+  SupportingMaterial,
+  BranchOption,
+  BranchingSettings
 } from '../types/scenario.types'
 import {
   createEmptyScenario,
   createEmptyModule,
   createEmptyInject,
-  createEmptyQuestion
+  createEmptyQuestion,
+  createEmptyBranchOption,
+  createDefaultBranchingSettings
 } from '../types/scenario.types'
 
 interface ScenarioStore {
@@ -48,6 +52,12 @@ interface ScenarioStore {
   addQuestion: (moduleId: string) => void
   updateQuestion: (moduleId: string, questionId: string, updates: Partial<DiscussionQuestion>) => void
   removeQuestion: (moduleId: string, questionId: string) => void
+
+  // Actions - Branching
+  addBranchToInject: (moduleId: string, injectId: string) => void
+  updateBranch: (moduleId: string, injectId: string, branchId: string, updates: Partial<BranchOption>) => void
+  removeBranch: (moduleId: string, injectId: string, branchId: string) => void
+  updateBranchingSettings: (settings: Partial<BranchingSettings>) => void
 
   // Actions - History
   undo: () => void
@@ -408,6 +418,139 @@ export const useScenarioStore = create<ScenarioStore>()(
                 }
               : m
           ),
+          updatedAt: new Date().toISOString()
+        }
+
+        set({
+          currentScenario: updatedScenario,
+          isDirty: true,
+          ...pushHistory(state, updatedScenario)
+        })
+      },
+
+      // Branching actions
+      addBranchToInject: (moduleId, injectId) => {
+        const state = get()
+        if (!state.currentScenario) return
+
+        const newBranch = createEmptyBranchOption()
+        const updatedScenario = {
+          ...state.currentScenario,
+          modules: state.currentScenario.modules.map(m =>
+            m.id === moduleId
+              ? {
+                  ...m,
+                  injects: m.injects.map(i =>
+                    i.id === injectId
+                      ? {
+                          ...i,
+                          branches: [...(i.branches || []), newBranch],
+                          updatedAt: new Date().toISOString()
+                        }
+                      : i
+                  ),
+                  updatedAt: new Date().toISOString()
+                }
+              : m
+          ),
+          // Initialize branching settings if not present
+          branchingSettings: state.currentScenario.branchingSettings || createDefaultBranchingSettings(),
+          updatedAt: new Date().toISOString()
+        }
+
+        // Enable branching when first branch is added
+        if (!state.currentScenario.branchingSettings?.enabled) {
+          updatedScenario.branchingSettings = {
+            ...updatedScenario.branchingSettings!,
+            enabled: true
+          }
+        }
+
+        set({
+          currentScenario: updatedScenario,
+          isDirty: true,
+          ...pushHistory(state, updatedScenario)
+        })
+      },
+
+      updateBranch: (moduleId, injectId, branchId, updates) => {
+        const state = get()
+        if (!state.currentScenario) return
+
+        const updatedScenario = {
+          ...state.currentScenario,
+          modules: state.currentScenario.modules.map(m =>
+            m.id === moduleId
+              ? {
+                  ...m,
+                  injects: m.injects.map(i =>
+                    i.id === injectId
+                      ? {
+                          ...i,
+                          branches: (i.branches || []).map(b =>
+                            b.id === branchId ? { ...b, ...updates } : b
+                          ),
+                          updatedAt: new Date().toISOString()
+                        }
+                      : i
+                  ),
+                  updatedAt: new Date().toISOString()
+                }
+              : m
+          ),
+          updatedAt: new Date().toISOString()
+        }
+
+        set({
+          currentScenario: updatedScenario,
+          isDirty: true,
+          ...pushHistory(state, updatedScenario)
+        })
+      },
+
+      removeBranch: (moduleId, injectId, branchId) => {
+        const state = get()
+        if (!state.currentScenario) return
+
+        const updatedScenario = {
+          ...state.currentScenario,
+          modules: state.currentScenario.modules.map(m =>
+            m.id === moduleId
+              ? {
+                  ...m,
+                  injects: m.injects.map(i =>
+                    i.id === injectId
+                      ? {
+                          ...i,
+                          branches: (i.branches || []).filter(b => b.id !== branchId),
+                          updatedAt: new Date().toISOString()
+                        }
+                      : i
+                  ),
+                  updatedAt: new Date().toISOString()
+                }
+              : m
+          ),
+          updatedAt: new Date().toISOString()
+        }
+
+        set({
+          currentScenario: updatedScenario,
+          isDirty: true,
+          ...pushHistory(state, updatedScenario)
+        })
+      },
+
+      updateBranchingSettings: (settings) => {
+        const state = get()
+        if (!state.currentScenario) return
+
+        const updatedScenario = {
+          ...state.currentScenario,
+          branchingSettings: {
+            ...(state.currentScenario.branchingSettings || createDefaultBranchingSettings()),
+            ...settings
+          },
           updatedAt: new Date().toISOString()
         }
 

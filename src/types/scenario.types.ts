@@ -92,6 +92,10 @@ export interface Scenario extends Identifiable {
 
   // Settings
   settings: ScenarioSettings
+
+  // Branching configuration
+  branchingSettings?: BranchingSettings
+  injectLibrary?: Inject[]         // Reusable injects for dynamic insertion
 }
 
 export interface ScenarioSettings {
@@ -160,6 +164,11 @@ export interface Inject extends Identifiable, Orderable {
 
   // Related discussion questions
   relatedQuestionIds: string[]
+
+  // Branching - makes this inject a decision point
+  branches?: BranchOption[]        // If present, this inject is a decision point
+  isBranchTarget?: boolean         // Marks inject as a potential branch destination
+  branchGroupId?: string           // Groups related branch injects for visualization
 }
 
 export interface Attachment {
@@ -219,6 +228,67 @@ export interface SupportingMaterial extends Identifiable {
   format: 'markdown' | 'html' | 'pdf' | 'docx'
   content: string
   description?: string
+}
+
+// ============================================
+// BRANCHING / DECISION TREES
+// ============================================
+
+/**
+ * A single branch option at a decision point inject
+ */
+export interface BranchOption {
+  id: string
+  label: string                    // Display text (e.g., "Team decides to pay ransom")
+  description?: string             // Longer explanation of what this choice represents
+  target: BranchTarget             // Where this branch leads
+  conditions?: BranchCondition[]   // Optional conditions for availability
+  isDefault?: boolean              // Marks the "continue normally" option
+  facilitatorNotes?: string        // Guidance for when to choose this branch
+}
+
+/**
+ * Specifies where a branch leads to
+ */
+export interface BranchTarget {
+  type: 'inject' | 'module' | 'end_module' | 'end_scenario' | 'insert_injects'
+  moduleId?: string                // For cross-module jumps
+  injectId?: string                // Target inject ID (for type 'inject')
+  targetModuleId?: string          // Target module ID (for type 'module')
+  insertedInjects?: InsertedInject[] // Dynamic injects (for type 'insert_injects')
+  continueAfterInsert?: boolean    // Return to branch point after inserted injects
+}
+
+/**
+ * Represents an inject that gets dynamically inserted based on a branch choice
+ */
+export interface InsertedInject {
+  type: 'inline' | 'reference'
+  inject?: Omit<Inject, 'id' | 'createdAt' | 'updatedAt' | 'order'> // For inline injects
+  injectRefId?: string             // Reference to inject in scenario's injectLibrary
+}
+
+/**
+ * Conditions for branch availability
+ */
+export interface BranchCondition {
+  type: 'response_value' | 'time_threshold' | 'inject_acknowledged' | 'always'
+  questionId?: string              // For response_value condition
+  expectedValue?: string | string[]
+  operator?: 'equals' | 'contains' | 'any_of' | 'none_of'
+  timeThresholdMinutes?: number    // For time_threshold condition
+  timeOperator?: 'greater_than' | 'less_than'
+  targetInjectId?: string          // For inject_acknowledged condition
+}
+
+/**
+ * Scenario-level branching configuration
+ */
+export interface BranchingSettings {
+  enabled: boolean
+  mode: 'facilitator_controlled' | 'participant_vote' | 'automatic'
+  showBranchHistory: boolean       // Show path taken in progress tracker
+  allowBacktracking: boolean       // Can facilitator go back to branch points
 }
 
 // ============================================
@@ -312,5 +382,24 @@ export function createEmptyQuestion(order: number): DiscussionQuestion {
     question: '',
     category: 'decision',
     responseType: 'text'
+  }
+}
+
+export function createEmptyBranchOption(): BranchOption {
+  return {
+    id: crypto.randomUUID(),
+    label: 'New Branch Option',
+    target: {
+      type: 'inject'
+    }
+  }
+}
+
+export function createDefaultBranchingSettings(): BranchingSettings {
+  return {
+    enabled: false,
+    mode: 'facilitator_controlled',
+    showBranchHistory: true,
+    allowBacktracking: false
   }
 }

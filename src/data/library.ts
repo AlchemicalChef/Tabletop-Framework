@@ -9,7 +9,16 @@ import {
   cisaOssScenario,
   scatteredSpiderScenario,
   shinyHuntersScenario,
-  revilSupplyChainScenario
+  revilSupplyChainScenario,
+  fin7CarbanakScenario,
+  magecartRetailScenario,
+  lapsusExtortionScenario,
+  apt29SupplyChainScenario,
+  voltTyphoonEnergyScenario,
+  lazarusSwiftScenario,
+  lockbitManufacturingScenario,
+  blackcatEnergyScenario,
+  clopHealthcareScenario
 } from './scenarios'
 
 export interface LibraryEntry {
@@ -35,5 +44,16 @@ export const libraryScenarios: LibraryEntry[] = [
   cisaOssScenario,
   scatteredSpiderScenario,
   shinyHuntersScenario,
-  revilSupplyChainScenario
+  revilSupplyChainScenario,
+  fin7CarbanakScenario,
+  magecartRetailScenario,
+  lapsusExtortionScenario,
+  // Nation-State APT Scenarios
+  apt29SupplyChainScenario,
+  voltTyphoonEnergyScenario,
+  lazarusSwiftScenario,
+  // Ransomware Scenarios
+  lockbitManufacturingScenario,
+  blackcatEnergyScenario,
+  clopHealthcareScenario
 ]

@@ -5,6 +5,8 @@ interface FacilitatorControlsProps {
   canAdvanceInject: boolean
   canAdvanceModule: boolean
   canGoBack: boolean
+  hasPendingBranch?: boolean
+  branchSelectionMode?: 'none' | 'awaiting' | 'selected'
   onStart: () => void
   onPause: () => void
   onResume: () => void
@@ -12,6 +14,7 @@ interface FacilitatorControlsProps {
   onAdvanceInject: () => void
   onAdvanceModule: () => void
   onPreviousInject: () => void
+  onOpenBranchSelector?: () => void
 }
 
 export default function FacilitatorControls({
@@ -19,13 +22,16 @@ export default function FacilitatorControls({
   canAdvanceInject,
   canAdvanceModule,
   canGoBack,
+  hasPendingBranch = false,
+  branchSelectionMode = 'none',
   onStart,
   onPause,
   onResume,
   onComplete,
   onAdvanceInject,
   onAdvanceModule,
-  onPreviousInject
+  onPreviousInject,
+  onOpenBranchSelector
 }: FacilitatorControlsProps) {
   const isActive = status === 'active'
   const isPaused = status === 'paused'
@@ -116,14 +122,28 @@ export default function FacilitatorControls({
             ← Back
           </button>
 
-          <button
-            className="btn btn-secondary"
-            onClick={onAdvanceInject}
-            disabled={!canAdvanceInject}
-            style={{ padding: 'var(--spacing-sm) var(--spacing-md)' }}
-          >
-            Next Inject →
-          </button>
+          {/* Show branch selector button when awaiting branch decision */}
+          {branchSelectionMode === 'awaiting' && onOpenBranchSelector ? (
+            <button
+              className="btn btn-primary"
+              onClick={onOpenBranchSelector}
+              style={{
+                padding: 'var(--spacing-sm) var(--spacing-md)',
+                animation: 'pulse 2s infinite'
+              }}
+            >
+              ⑂ Select Path
+            </button>
+          ) : (
+            <button
+              className="btn btn-secondary"
+              onClick={onAdvanceInject}
+              disabled={!canAdvanceInject || branchSelectionMode === 'awaiting'}
+              style={{ padding: 'var(--spacing-sm) var(--spacing-md)' }}
+            >
+              Next Inject →
+            </button>
+          )}
 
           <div style={{
             width: '1px',
@@ -135,11 +155,28 @@ export default function FacilitatorControls({
           <button
             className="btn btn-secondary"
             onClick={onAdvanceModule}
-            disabled={!canAdvanceModule}
+            disabled={!canAdvanceModule || branchSelectionMode === 'awaiting'}
             style={{ padding: 'var(--spacing-sm) var(--spacing-md)' }}
           >
             Next Module ⏭
           </button>
+        </div>
+      )}
+
+      {/* Branch indicator */}
+      {hasPendingBranch && branchSelectionMode !== 'awaiting' && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 'var(--spacing-xs)',
+          padding: 'var(--spacing-xs) var(--spacing-sm)',
+          backgroundColor: 'var(--color-bg-tertiary)',
+          borderRadius: 'var(--radius-sm)',
+          fontSize: '0.75rem',
+          color: 'var(--color-text-secondary)'
+        }}>
+          <span>⑂</span>
+          <span>Current inject has branches</span>
         </div>
       )}
 

@@ -1,9 +1,12 @@
 import { useState } from 'react'
-import type { Inject, InjectType, Severity } from '../../types/scenario.types'
+import type { Inject, InjectType, Severity, Module, BranchOption } from '../../types/scenario.types'
+import BranchEditor from './BranchEditor'
 
 interface InjectEditorProps {
   inject: Inject
   index: number
+  modules: Module[]
+  currentModuleId: string
   onUpdate: (updates: Partial<Inject>) => void
   onDelete: () => void
 }
@@ -26,9 +29,12 @@ const SEVERITY_OPTIONS: { value: Severity; label: string; color: string }[] = [
   { value: 'critical', label: 'Critical', color: 'var(--color-severity-critical)' }
 ]
 
-export default function InjectEditor({ inject, index, onUpdate, onDelete }: InjectEditorProps) {
+export default function InjectEditor({ inject, index, modules, currentModuleId, onUpdate, onDelete }: InjectEditorProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [showBranchSection, setShowBranchSection] = useState(false)
+
+  const hasBranches = inject.branches && inject.branches.length > 0
 
   const severityOption = SEVERITY_OPTIONS.find(s => s.value === inject.severity)
   const typeOption = INJECT_TYPES.find(t => t.value === inject.type)
@@ -86,6 +92,19 @@ export default function InjectEditor({ inject, index, onUpdate, onDelete }: Inje
               >
                 {inject.severity}
               </span>
+              {hasBranches && (
+                <span
+                  className="badge"
+                  style={{
+                    backgroundColor: 'rgba(102, 126, 234, 0.2)',
+                    color: 'var(--color-primary)',
+                    fontSize: '0.625rem',
+                    padding: '2px 6px'
+                  }}
+                >
+                  ⑂ {inject.branches?.length} branch{inject.branches?.length !== 1 ? 'es' : ''}
+                </span>
+              )}
             </div>
             <div style={{
               fontSize: '0.75rem',
@@ -290,6 +309,75 @@ export default function InjectEditor({ inject, index, onUpdate, onDelete }: Inje
               placeholder="Additional guidance for the facilitator..."
               style={{ resize: 'vertical' }}
             />
+          </div>
+
+          {/* Branching Section */}
+          <div style={{
+            borderTop: '1px solid var(--color-border)',
+            paddingTop: 'var(--spacing-md)'
+          }}>
+            <button
+              className="btn btn-ghost"
+              onClick={() => setShowBranchSection(!showBranchSection)}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: 'var(--spacing-sm)',
+                backgroundColor: hasBranches
+                  ? 'rgba(102, 126, 234, 0.1)'
+                  : 'var(--color-bg-tertiary)',
+                borderRadius: 'var(--radius-sm)',
+                border: hasBranches
+                  ? '1px solid var(--color-primary)'
+                  : '1px solid var(--color-border)'
+              }}
+            >
+              <div className="flex items-center gap-sm">
+                <span style={{ fontSize: '1rem' }}>⑂</span>
+                <span style={{
+                  fontWeight: 500,
+                  color: hasBranches
+                    ? 'var(--color-primary)'
+                    : 'var(--color-text-secondary)'
+                }}>
+                  Branching / Decision Point
+                </span>
+                {hasBranches && (
+                  <span style={{
+                    backgroundColor: 'var(--color-primary)',
+                    color: 'white',
+                    padding: '2px 6px',
+                    borderRadius: 'var(--radius-sm)',
+                    fontSize: '0.625rem',
+                    fontWeight: 600
+                  }}>
+                    {inject.branches?.length} option{inject.branches?.length !== 1 ? 's' : ''}
+                  </span>
+                )}
+              </div>
+              <span style={{
+                transform: showBranchSection ? 'rotate(90deg)' : 'rotate(0deg)',
+                transition: 'transform 0.2s',
+                fontSize: '0.625rem',
+                color: 'var(--color-text-muted)'
+              }}>
+                ▶
+              </span>
+            </button>
+
+            {showBranchSection && (
+              <div style={{ marginTop: 'var(--spacing-md)' }}>
+                <BranchEditor
+                  branches={inject.branches || []}
+                  modules={modules}
+                  currentModuleId={currentModuleId}
+                  currentInjectId={inject.id}
+                  onUpdate={(branches: BranchOption[]) => onUpdate({ branches })}
+                />
+              </div>
+            )}
           </div>
 
           {/* Actions */}

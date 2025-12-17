@@ -8,6 +8,8 @@ interface InjectDisplayProps {
   showFacilitatorNotes: boolean
   onAcknowledge?: () => void
   isAcknowledged?: boolean
+  hasBranches?: boolean
+  pendingBranchDecision?: boolean
 }
 
 const SEVERITY_COLORS: Record<Severity, { bg: string; text: string; label: string }> = {
@@ -35,7 +37,9 @@ export default function InjectDisplay({
   totalInjects,
   showFacilitatorNotes,
   onAcknowledge,
-  isAcknowledged
+  isAcknowledged,
+  hasBranches = false,
+  pendingBranchDecision = false
 }: InjectDisplayProps) {
   if (!inject) {
     return (
@@ -137,6 +141,65 @@ export default function InjectDisplay({
           </span>
         </div>
       </div>
+
+      {/* Decision Point Banner */}
+      {(hasBranches || (inject.branches && inject.branches.length > 0)) && (
+        <div style={{
+          padding: 'var(--spacing-sm) var(--spacing-lg)',
+          backgroundColor: pendingBranchDecision
+            ? 'rgba(237, 137, 54, 0.15)'
+            : 'rgba(102, 126, 234, 0.15)',
+          borderBottom: `2px solid ${pendingBranchDecision
+            ? 'var(--color-severity-high)'
+            : 'var(--color-primary)'}`,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 'var(--spacing-sm)'
+          }}>
+            <span style={{
+              fontSize: '1.25rem'
+            }}>
+              ⑂
+            </span>
+            <div>
+              <div style={{
+                fontWeight: 600,
+                color: pendingBranchDecision
+                  ? 'var(--color-severity-high)'
+                  : 'var(--color-primary)',
+                fontSize: '0.875rem'
+              }}>
+                {pendingBranchDecision ? 'Decision Required' : 'Decision Point'}
+              </div>
+              <div style={{
+                fontSize: '0.75rem',
+                color: 'var(--color-text-secondary)'
+              }}>
+                {inject.branches?.length || 0} branch option{(inject.branches?.length || 0) !== 1 ? 's' : ''} available
+              </div>
+            </div>
+          </div>
+          {pendingBranchDecision && (
+            <span style={{
+              padding: 'var(--spacing-xs) var(--spacing-sm)',
+              backgroundColor: 'var(--color-severity-high)',
+              color: 'white',
+              borderRadius: 'var(--radius-sm)',
+              fontSize: '0.75rem',
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              animation: 'pulse 2s infinite'
+            }}>
+              Awaiting Selection
+            </span>
+          )}
+        </div>
+      )}
 
       {/* Source */}
       {inject.source && (

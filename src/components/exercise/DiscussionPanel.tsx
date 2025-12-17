@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import type { DiscussionQuestion } from '../../types/scenario.types'
-import type { ParticipantResponse } from '../../types/exercise.types'
+import type { ParticipantResponse, DiscussionState, DiscussionStatus } from '../../types/exercise.types'
 
 interface DiscussionPanelProps {
   questions: DiscussionQuestion[]
@@ -9,6 +9,14 @@ interface DiscussionPanelProps {
   showFacilitatorNotes: boolean
   onQuestionSelect: (index: number) => void
   onAddResponse: (questionId: string, response: string) => void
+  // Discussion state tracking (optional for backwards compatibility)
+  discussionStates?: Record<string, DiscussionState>
+  onStartDiscussion?: (questionId: string) => void
+  onConcludeDiscussion?: (questionId: string) => void
+  onAddKeyTheme?: (questionId: string, theme: string) => void
+  onRemoveKeyTheme?: (questionId: string, theme: string) => void
+  onHighlightResponse?: (questionId: string, responseId: string) => void
+  onUnhighlightResponse?: (questionId: string, responseId: string) => void
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -21,19 +29,117 @@ const CATEGORY_COLORS: Record<string, string> = {
   lessons_learned: '#a0aec0'
 }
 
+const STATUS_CONFIG: Record<DiscussionStatus, { label: string; color: string; icon: string }> = {
+  not_started: { label: 'Not Started', color: 'var(--color-text-muted)', icon: '○' },
+  in_progress: { label: 'In Progress', color: 'var(--color-accent-primary)', icon: '●' },
+  concluded: { label: 'Concluded', color: 'var(--color-severity-low)', icon: '✓' }
+}
+
+function formatTimeSpent(seconds: number): string {
+  if (seconds < 60) return `${seconds}s`
+  const minutes = Math.floor(seconds / 60)
+  const secs = seconds % 60
+  if (minutes < 60) return `${minutes}m ${secs}s`
+  const hours = Math.floor(minutes / 60)
+  const mins = minutes % 60
+  return `${hours}h ${mins}m`
+}
+
 export default function DiscussionPanel({
   questions,
   responses,
   currentQuestionIndex,
   showFacilitatorNotes,
   onQuestionSelect,
-  onAddResponse
+  onAddResponse,
+  discussionStates,
+  onStartDiscussion,
+  onConcludeDiscussion,
+  onAddKeyTheme,
+  onRemoveKeyTheme,
+  onHighlightResponse,
+  onUnhighlightResponse
 }: DiscussionPanelProps) {
   const [newResponse, setNewResponse] = useState('')
+  const [newTheme, setNewTheme] = useState('')
+  const [localTimeSpent, setLocalTimeSpent] = useState(0)
+  const timerRef = useRef<number | null>(null)
   const currentQuestion = questions[currentQuestionIndex]
+
+  // Get discussion state for current question
+  const currentDiscussionState = currentQuestion && discussionStates
+    ? discussionStates[currentQuestion.id]
+    : undefined
+
+  const discussionStatus = currentDiscussionState?.status || 'not_started'
+
+  // Track local time for in-progress discussions
+  useEffect(() => {
+    if (discussionStatus === 'in_progress' && currentDiscussionState) {
+      // Start local timer from the saved time
+      setLocalTimeSpent(currentDiscussionState.timeSpent)
+
+      timerRef.current = window.setInterval(() => {
+        setLocalTimeSpent(prev => prev + 1)
+      }, 1000)
+    } else {
+      // Clear timer when not in progress
+      if (timerRef.current) {
+        clearInterval(timerRef.current)
+        timerRef.current = null
+      }
+      // Reset to saved time
+      setLocalTimeSpent(currentDiscussionState?.timeSpent || 0)
+    }
+
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current)
+      }
+    }
+  }, [discussionStatus, currentDiscussionState?.timeSpent, currentQuestion?.id])
 
   const getResponsesForQuestion = (questionId: string) => {
     return responses.filter(r => r.questionId === questionId)
+  }
+
+  const getDiscussionState = (questionId: string): DiscussionState | undefined => {
+    return discussionStates?.[questionId]
+  }
+
+  const handleStartDiscussion = () => {
+    if (currentQuestion && onStartDiscussion) {
+      onStartDiscussion(currentQuestion.id)
+    }
+  }
+
+  const handleConcludeDiscussion = () => {
+    if (currentQuestion && onConcludeDiscussion) {
+      onConcludeDiscussion(currentQuestion.id)
+    }
+  }
+
+  const handleAddTheme = () => {
+    if (currentQuestion && onAddKeyTheme && newTheme.trim()) {
+      onAddKeyTheme(currentQuestion.id, newTheme.trim())
+      setNewTheme('')
+    }
+  }
+
+  const handleRemoveTheme = (theme: string) => {
+    if (currentQuestion && onRemoveKeyTheme) {
+      onRemoveKeyTheme(currentQuestion.id, theme)
+    }
+  }
+
+  const handleToggleHighlight = (responseId: string, isHighlighted: boolean) => {
+    if (currentQuestion) {
+      if (isHighlighted && onUnhighlightResponse) {
+        onUnhighlightResponse(currentQuestion.id, responseId)
+      } else if (!isHighlighted && onHighlightResponse) {
+        onHighlightResponse(currentQuestion.id, responseId)
+      }
+    }
   }
 
   if (questions.length === 0) {
@@ -70,12 +176,26 @@ export default function DiscussionPanel({
         <h3 style={{ fontSize: '0.875rem', fontWeight: 600, margin: 0 }}>
           Discussion Questions
         </h3>
-        <span style={{
-          fontSize: '0.75rem',
-          color: 'var(--color-text-muted)'
-        }}>
-          {currentQuestionIndex + 1} of {questions.length}
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)' }}>
+          {/* Summary stats */}
+          {discussionStates && (
+            <div style={{ display: 'flex', gap: 'var(--spacing-xs)', fontSize: '0.625rem' }}>
+              <span style={{ color: 'var(--color-severity-low)' }}>
+                {questions.filter(q => getDiscussionState(q.id)?.status === 'concluded').length} done
+              </span>
+              <span style={{ color: 'var(--color-text-muted)' }}>·</span>
+              <span style={{ color: 'var(--color-accent-primary)' }}>
+                {questions.filter(q => getDiscussionState(q.id)?.status === 'in_progress').length} active
+              </span>
+            </div>
+          )}
+          <span style={{
+            fontSize: '0.75rem',
+            color: 'var(--color-text-muted)'
+          }}>
+            {currentQuestionIndex + 1} of {questions.length}
+          </span>
+        </div>
       </div>
 
       {/* Question Tabs */}
@@ -89,6 +209,9 @@ export default function DiscussionPanel({
         {questions.map((q, i) => {
           const categoryColor = CATEGORY_COLORS[q.category] || '#a0aec0'
           const hasResponses = getResponsesForQuestion(q.id).length > 0
+          const qDiscussionState = getDiscussionState(q.id)
+          const qStatus = qDiscussionState?.status || 'not_started'
+          const statusConfig = STATUS_CONFIG[qStatus]
 
           return (
             <button
@@ -110,16 +233,25 @@ export default function DiscussionPanel({
                 display: 'flex',
                 alignItems: 'center',
                 gap: '4px',
-                whiteSpace: 'nowrap'
+                whiteSpace: 'nowrap',
+                position: 'relative'
               }}
             >
+              {/* Status indicator */}
               <span style={{
                 width: '6px',
                 height: '6px',
                 borderRadius: '50%',
-                backgroundColor: hasResponses ? categoryColor : 'var(--color-bg-elevated)'
+                backgroundColor: qStatus === 'not_started'
+                  ? (hasResponses ? categoryColor : 'var(--color-bg-elevated)')
+                  : statusConfig.color,
+                border: qStatus === 'in_progress' ? `1px solid ${statusConfig.color}` : 'none',
+                animation: qStatus === 'in_progress' ? 'statusPulse 1.5s ease-in-out infinite' : undefined
               }} />
               Q{i + 1}
+              {qStatus === 'concluded' && (
+                <span style={{ fontSize: '0.625rem', color: 'var(--color-severity-low)' }}>✓</span>
+              )}
             </button>
           )
         })}
@@ -128,6 +260,68 @@ export default function DiscussionPanel({
       {/* Current Question */}
       {currentQuestion && (
         <div style={{ padding: 'var(--spacing-lg)' }}>
+          {/* Discussion Controls */}
+          {(onStartDiscussion || onConcludeDiscussion) && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: 'var(--spacing-md)',
+              padding: 'var(--spacing-sm) var(--spacing-md)',
+              backgroundColor: 'var(--color-bg-tertiary)',
+              borderRadius: 'var(--radius-md)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
+                <span style={{
+                  fontSize: '0.625rem',
+                  fontWeight: 500,
+                  color: STATUS_CONFIG[discussionStatus].color,
+                  textTransform: 'uppercase'
+                }}>
+                  {STATUS_CONFIG[discussionStatus].icon} {STATUS_CONFIG[discussionStatus].label}
+                </span>
+                {(discussionStatus === 'in_progress' || discussionStatus === 'concluded') && (
+                  <span style={{
+                    fontSize: '0.625rem',
+                    color: 'var(--color-text-muted)',
+                    fontFamily: 'var(--font-mono)'
+                  }}>
+                    {formatTimeSpent(localTimeSpent)}
+                  </span>
+                )}
+              </div>
+              <div style={{ display: 'flex', gap: 'var(--spacing-xs)' }}>
+                {discussionStatus === 'not_started' && onStartDiscussion && (
+                  <button
+                    onClick={handleStartDiscussion}
+                    className="btn btn-primary"
+                    style={{ padding: '4px 12px', fontSize: '0.75rem' }}
+                  >
+                    Start Discussion
+                  </button>
+                )}
+                {discussionStatus === 'in_progress' && onConcludeDiscussion && (
+                  <button
+                    onClick={handleConcludeDiscussion}
+                    className="btn btn-secondary"
+                    style={{ padding: '4px 12px', fontSize: '0.75rem' }}
+                  >
+                    Mark Concluded
+                  </button>
+                )}
+                {discussionStatus === 'concluded' && onStartDiscussion && (
+                  <button
+                    onClick={handleStartDiscussion}
+                    className="btn btn-ghost"
+                    style={{ padding: '4px 12px', fontSize: '0.75rem' }}
+                  >
+                    Reopen
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Category Badge */}
           <div style={{ marginBottom: 'var(--spacing-md)' }}>
             <span style={{
@@ -260,6 +454,88 @@ export default function DiscussionPanel({
             </>
           )}
 
+          {/* Key Themes Capture (from discussion) */}
+          {onAddKeyTheme && (
+            <div style={{
+              marginBottom: 'var(--spacing-md)',
+              padding: 'var(--spacing-md)',
+              backgroundColor: 'var(--color-bg-tertiary)',
+              borderRadius: 'var(--radius-md)'
+            }}>
+              <div style={{
+                fontSize: '0.75rem',
+                color: 'var(--color-text-muted)',
+                marginBottom: 'var(--spacing-xs)'
+              }}>
+                Key Themes (captured during discussion):
+              </div>
+              <div style={{
+                display: 'flex',
+                gap: 'var(--spacing-xs)',
+                flexWrap: 'wrap',
+                marginBottom: 'var(--spacing-sm)'
+              }}>
+                {currentDiscussionState?.keyThemes?.map((theme, i) => (
+                  <span
+                    key={i}
+                    style={{
+                      padding: '2px 8px',
+                      backgroundColor: 'var(--color-accent-primary)',
+                      color: 'white',
+                      borderRadius: 'var(--radius-full)',
+                      fontSize: '0.75rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}
+                  >
+                    {theme}
+                    {onRemoveKeyTheme && (
+                      <button
+                        onClick={() => handleRemoveTheme(theme)}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: 'white',
+                          cursor: 'pointer',
+                          padding: 0,
+                          fontSize: '0.75rem',
+                          opacity: 0.8
+                        }}
+                      >
+                        ×
+                      </button>
+                    )}
+                  </span>
+                ))}
+                {(!currentDiscussionState?.keyThemes || currentDiscussionState.keyThemes.length === 0) && (
+                  <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontStyle: 'italic' }}>
+                    No themes captured yet
+                  </span>
+                )}
+              </div>
+              <div style={{ display: 'flex', gap: 'var(--spacing-xs)' }}>
+                <input
+                  type="text"
+                  className="input"
+                  value={newTheme}
+                  onChange={(e) => setNewTheme(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleAddTheme()}
+                  placeholder="Add theme..."
+                  style={{ flex: 1, fontSize: '0.75rem', padding: '4px 8px' }}
+                />
+                <button
+                  onClick={handleAddTheme}
+                  disabled={!newTheme.trim()}
+                  className="btn btn-secondary"
+                  style={{ padding: '4px 8px', fontSize: '0.75rem' }}
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Collected Responses */}
           {getResponsesForQuestion(currentQuestion.id).length > 0 && (
             <div style={{
@@ -271,24 +547,59 @@ export default function DiscussionPanel({
                 fontSize: '0.75rem',
                 color: 'var(--color-text-muted)',
                 marginBottom: 'var(--spacing-sm)',
-                textTransform: 'uppercase'
+                textTransform: 'uppercase',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
               }}>
-                Collected Responses ({getResponsesForQuestion(currentQuestion.id).length})
+                <span>Collected Responses ({getResponsesForQuestion(currentQuestion.id).length})</span>
+                {currentDiscussionState?.highlightedResponseIds && currentDiscussionState.highlightedResponseIds.length > 0 && (
+                  <span style={{ color: 'var(--color-severity-medium)' }}>
+                    {currentDiscussionState.highlightedResponseIds.length} highlighted
+                  </span>
+                )}
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
-                {getResponsesForQuestion(currentQuestion.id).map((response) => (
-                  <div
-                    key={response.id}
-                    style={{
-                      padding: 'var(--spacing-sm) var(--spacing-md)',
-                      backgroundColor: 'var(--color-bg-tertiary)',
-                      borderRadius: 'var(--radius-md)',
-                      fontSize: '0.875rem'
-                    }}
-                  >
-                    {response.textResponse}
-                  </div>
-                ))}
+                {getResponsesForQuestion(currentQuestion.id).map((response) => {
+                  const isHighlighted = currentDiscussionState?.highlightedResponseIds?.includes(response.id) || false
+
+                  return (
+                    <div
+                      key={response.id}
+                      style={{
+                        padding: 'var(--spacing-sm) var(--spacing-md)',
+                        backgroundColor: isHighlighted
+                          ? 'rgba(236, 201, 75, 0.15)'
+                          : 'var(--color-bg-tertiary)',
+                        borderRadius: 'var(--radius-md)',
+                        fontSize: '0.875rem',
+                        border: isHighlighted ? '1px solid var(--color-severity-medium)' : '1px solid transparent',
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: 'var(--spacing-sm)'
+                      }}
+                    >
+                      {onHighlightResponse && (
+                        <button
+                          onClick={() => handleToggleHighlight(response.id, isHighlighted)}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            padding: '2px',
+                            fontSize: '1rem',
+                            color: isHighlighted ? 'var(--color-severity-medium)' : 'var(--color-text-muted)',
+                            flexShrink: 0
+                          }}
+                          title={isHighlighted ? 'Remove highlight' : 'Highlight response'}
+                        >
+                          {isHighlighted ? '★' : '☆'}
+                        </button>
+                      )}
+                      <span style={{ flex: 1 }}>{response.textResponse}</span>
+                    </div>
+                  )
+                })}
               </div>
             </div>
           )}
@@ -332,6 +643,13 @@ export default function DiscussionPanel({
           </div>
         </div>
       )}
+
+      <style>{`
+        @keyframes statusPulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.4; }
+        }
+      `}</style>
     </div>
   )
 }
