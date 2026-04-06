@@ -33,7 +33,7 @@
     "electron-builder": "^26.0.12",
     "electron-vite": "^4.0.1",
     "typescript": "^5.9.3",
-    "vite": "^7.2.6"
+    "vite": "^7.3.2"
   },
   "build": {
     "appId": "com.ctep.tabletop-framework",
